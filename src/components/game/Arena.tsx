@@ -1,8 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react';
 import type { Tower as TowerType, Unit as UnitType } from '../../types';
+import { drawTower } from './Tower';
+import { drawUnit } from './Unit';
 
 // Arena texture constants
-const ARENA_TEXTURE_PATH = 'assets/sc/arena_training_tex.png';
+const ARENA_TEXTURE_PATH = 'assets/game/arena_training_tex.png';
 const ARENA_TEXTURE_WIDTH = 970;
 const ARENA_TEXTURE_HEIGHT = 1018;
 
@@ -93,56 +95,14 @@ const Arena: React.FC<ArenaProps> = ({
     ctx.fillStyle = '#8b7355';
     ctx.fillRect(width / 2 - 30, height / 2 - 40, 60, 80);
 
-    // Draw towers
+    // Draw towers using sprite
     towers.forEach((tower) => {
-      const x = tower.position.x;
-      const y = tower.position.y;
-      const size = tower.isKingTower ? 50 : 35;
-
-      // Tower base
-      ctx.fillStyle = tower.isKingTower ? '#8b4513' : '#a0522d';
-      ctx.fillRect(x - size / 2, y - size / 2, size, size);
-
-      // Tower top
-      ctx.fillStyle = '#cd853f';
-      ctx.beginPath();
-      ctx.moveTo(x - size / 2, y - size / 2);
-      ctx.lineTo(x, y - size);
-      ctx.lineTo(x + size / 2, y - size / 2);
-      ctx.closePath();
-      ctx.fill();
-
-      // Health bar
-      const healthPercent = tower.health / tower.maxHealth;
-      ctx.fillStyle = '#333';
-      ctx.fillRect(x - size / 2, y - size - 15, size, 6);
-      ctx.fillStyle = healthPercent > 0.5 ? '#4caf50' : healthPercent > 0.25 ? '#ff9800' : '#f44336';
-      ctx.fillRect(x - size / 2, y - size - 15, size * healthPercent, 6);
+      drawTower(ctx, tower);
     });
 
-    // Draw units
+    // Draw units using sprites
     units.forEach((unit) => {
-      const x = unit.position.x;
-      const y = unit.position.y;
-      const radius = 15;
-
-      // Unit circle
-      ctx.fillStyle = unit.isEnemy ? '#e74c3c' : '#3498db';
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Unit border
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Health bar
-      const healthPercent = unit.health / unit.maxHealth;
-      ctx.fillStyle = '#333';
-      ctx.fillRect(x - 12, y - 25, 24, 4);
-      ctx.fillStyle = healthPercent > 0.5 ? '#4caf50' : '#f44336';
-      ctx.fillRect(x - 12, y - 25, 24 * healthPercent, 4);
+      drawUnit(ctx, unit);
     });
 
   }, [towers, units, width, height, textureLoaded]);
