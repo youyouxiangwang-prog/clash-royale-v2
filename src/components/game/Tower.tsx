@@ -69,7 +69,7 @@ export function drawTower(
   const isKing = tower.isKingTower;
   
   // Get base size for tower
-  const baseSize = isKing ? 60 : 45;
+  const baseSize = isKing ? 140 : 100;
   
   // Draw tower base (king tower sprite)
   const kingSprite = spriteCache.get('king');
@@ -102,7 +102,7 @@ export function drawTower(
   drawPrincessOverlay(ctx, tower);
   
   // Draw health bar
-  drawHealthBar(ctx, x, y - baseSize - 15, baseSize);
+  drawHealthBar(ctx, x, y - baseSize - 25, baseSize);
 }
 
 /**
@@ -115,10 +115,10 @@ function drawPrincessOverlay(ctx: CanvasRenderingContext2D, tower: TowerType): v
   const isKing = tower.isKingTower;
   
   // Princess sprite size
-  const princessSize = isKing ? 35 : 28;
+  const princessSize = 100;
   
   // Princess is positioned on top of tower, slightly offset upward
-  const princessY = y - (isKing ? 85 : 65);
+  const princessY = y - (isKing ? 180 : 140);
   
   const princessSprite = spriteCache.get('princess');
   if (princessSprite) {
