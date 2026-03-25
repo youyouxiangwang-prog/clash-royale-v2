@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import type { Tower as TowerType, Unit as UnitType } from '../../types';
 import { drawTower } from './Tower';
 import { drawUnit } from './Unit';
@@ -15,14 +15,15 @@ interface ArenaProps {
 const Arena: React.FC<ArenaProps> = ({ 
   towers, 
   units, 
-  width = 800, 
-  height = 600 
+  width = 506, 
+  height = 832 
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const envRendererRef = useRef<EnvironmentRenderer | null>(null);
   const animationRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
-  const [isEnvReady, setIsEnvReady] = useState(false);
+  const isEnvReadyRef = useRef(false);
+  const hasLoadedAssetsRef = useRef(false);
 
   // Bridge positions (left and right bridges for portrait arena)
   const bridgePositions = [
@@ -33,8 +34,15 @@ const Arena: React.FC<ArenaProps> = ({
   // River height should be proportional to arena size
   const riverHeight = Math.round(height * 0.05); // ~5% of height = ~42 for 832
 
-  // Initialize environment renderer
+  // Initialize environment renderer (only once)
   useEffect(() => {
+    // Skip if already loaded assets
+    if (hasLoadedAssetsRef.current) {
+      console.log('Arena: Assets already loaded, skipping');
+      return;
+    }
+    hasLoadedAssetsRef.current = true;
+
     const config: ArenaConfig = {
       width,
       height,
@@ -50,12 +58,13 @@ const Arena: React.FC<ArenaProps> = ({
     envRenderer.loadAssets()
       .then(() => {
         envRenderer.generateDefaultDecorations();
-        setIsEnvReady(true);
+        isEnvReadyRef.current = true;
         console.log('Arena: Environment ready');
       })
       .catch(err => {
         console.error('Arena: Failed to load environment assets', err);
-        setIsEnvReady(true); // Continue anyway with fallback
+        // Continue anyway with fallback
+        isEnvReadyRef.current = true;
       });
 
     // Cleanup
@@ -64,7 +73,7 @@ const Arena: React.FC<ArenaProps> = ({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [width, height]);
+  }, []); // Empty deps - only run once on mount
 
   // Animation loop
   useEffect(() => {
@@ -81,8 +90,8 @@ const Arena: React.FC<ArenaProps> = ({
       // Clear canvas
       ctx.clearRect(0, 0, width, height);
 
-      // Render environment if ready
-      if (envRendererRef.current && isEnvReady) {
+      // Render environment if ready (use ref to avoid re-triggering)
+      if (envRendererRef.current && isEnvReadyRef.current) {
         envRendererRef.current.render(ctx, deltaTime);
       } else {
         // Fallback: simple grass gradient
@@ -113,7 +122,7 @@ const Arena: React.FC<ArenaProps> = ({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [towers, units, width, height, isEnvReady]);
+  }, [towers, units, width, height]); // Note: NOT including isEnvReady to avoid re-triggering
 
   return (
     <div className="arena-container" style={{ position: 'relative', width, height }}>
