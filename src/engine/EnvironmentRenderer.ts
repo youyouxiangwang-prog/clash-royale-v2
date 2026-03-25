@@ -11,18 +11,13 @@
  */
 
 import {
-  DecorationPlacement,
   ArenaConfig,
-  getDefaultAvoidZones,
-  isInAvoidZone,
 } from './types/environment';
 
 // Asset paths
 const ASSET_BASE = '/assets/game/';
 const ARENA_BACKGROUND_PATH = ASSET_BASE + 'arena_background.png';
 const ARENA_ANIMATION_PATH = ASSET_BASE + 'arena_animation/level_barbarian_arena_sprite_';
-const DECOS_PATH = ASSET_BASE + 'environment/decos/level_decos_sprite_';
-
 export class EnvironmentRenderer {
   // Configuration
   private config: ArenaConfig;
@@ -37,7 +32,6 @@ export class EnvironmentRenderer {
   
   // === LAYER 3: Decorations ===
   private decosSprites: Map<number, HTMLImageElement> = new Map();
-  private decorations: DecorationPlacement[] = [];
   
   // === LAYER 5: River Animation ===
   private riverTime: number = 0;
@@ -88,30 +82,8 @@ export class EnvironmentRenderer {
   /**
    * LAYER 3: Render decorative elements (trees, bushes, rocks)
    */
-  async renderLayer3_Decorations(ctx: CanvasRenderingContext2D): Promise<void> {
-    if (this.decorations.length === 0) return;
-    
-    for (const deco of this.decorations) {
-      const sprite = this.decosSprites.get(deco.spriteIndex);
-      if (!sprite) continue;
-      
-      ctx.save();
-      
-      const scaledWidth = sprite.width * deco.scale;
-      const scaledHeight = sprite.height * deco.scale;
-      const drawX = deco.x - scaledWidth / 2;
-      const drawY = deco.y - scaledHeight;
-      
-      // Apply horizontal flip if needed
-      if (deco.flip) {
-        ctx.translate(deco.x, 0);
-        ctx.scale(-1, 1);
-        ctx.translate(-deco.x, 0);
-      }
-      
-      ctx.drawImage(sprite, drawX, drawY, scaledWidth, scaledHeight);
-      ctx.restore();
-    }
+  async renderLayer3_Decorations(_ctx: CanvasRenderingContext2D): Promise<void> {
+    return;
   }
   
   /**
@@ -281,15 +253,7 @@ export class EnvironmentRenderer {
         this.animationFrames[i] = img;
       }).catch(() => {});
     }
-    
-    // Load decoration sprites (indices 0-106)
-    for (let i = 0; i < 107; i++) {
-      const spriteIndex = i.toString().padStart(3, '0');
-      this.loadImage(`${DECOS_PATH}${spriteIndex}.png`).then(img => {
-        this.decosSprites.set(i, img);
-      }).catch(() => {});
-    }
-    
+
     this.assetsLoaded = true;
     console.log('EnvironmentRenderer: Assets loading in background');
   }
@@ -298,51 +262,6 @@ export class EnvironmentRenderer {
    * Generate default decoration placement
    */
   generateDefaultDecorations(): void {
-    const { width, height } = this.config;
-    const avoidZones = getDefaultAvoidZones(this.config);
-    this.decorations = [];
-    
-    const isValidPosition = (x: number, y: number, margin: number = 35): boolean => {
-      if (isInAvoidZone(x, y, avoidZones)) return false;
-      for (const deco of this.decorations) {
-        const dist = Math.sqrt((x - deco.x) ** 2 + (y - deco.y) ** 2);
-        if (dist < margin) return false;
-      }
-      if (x < 30 || x > width - 30 || y < 30 || y > height - 30) return false;
-      return true;
-    };
-    
-    const addSymmetric = (x: number, y: number, spriteIndex: number, scale: number) => {
-      const mirrorX = width - x;
-      if (isValidPosition(x, y)) {
-        this.decorations.push({ spriteIndex, x, y, scale, flip: x > width / 2 });
-      }
-      if (isValidPosition(mirrorX, y)) {
-        this.decorations.push({ spriteIndex, x: mirrorX, y, scale, flip: mirrorX > width / 2 });
-      }
-    };
-    
-    // Trees in corners
-    addSymmetric(45, 65, 0, 0.85);
-    addSymmetric(80, 45, 1, 0.8);
-    addSymmetric(35, 105, 2, 0.75);
-    addSymmetric(45, height - 65, 3, 0.85);
-    addSymmetric(80, height - 45, 4, 0.8);
-    addSymmetric(35, height - 105, 5, 0.75);
-    
-    // Bushes near lanes
-    addSymmetric(95, 85, 16, 0.6);
-    addSymmetric(145, 105, 17, 0.55);
-    addSymmetric(95, height - 85, 18, 0.6);
-    addSymmetric(145, height - 105, 19, 0.55);
-    
-    // Rocks scattered
-    addSymmetric(115, 155, 41, 0.55);
-    addSymmetric(155, 195, 42, 0.5);
-    addSymmetric(115, height - 155, 43, 0.55);
-    addSymmetric(155, height - 195, 44, 0.5);
-    
-    console.log(`EnvironmentRenderer: ${this.decorations.length} decorations placed`);
   }
   
   /**
