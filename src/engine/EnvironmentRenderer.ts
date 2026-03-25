@@ -45,34 +45,47 @@ export class EnvironmentRenderer {
       return;
     }
     
-    const loadPromises: Promise<void>[] = [];
+    console.log('EnvironmentRenderer: Starting asset load...');
     
-    // Load background image
-    loadPromises.push(this.loadImage(ARENA_BACKGROUND_PATH).then(img => {
-      this.backgroundImage = img;
-    }));
+    // Load background image first (critical)
+    try {
+      this.backgroundImage = await this.loadImage(ARENA_BACKGROUND_PATH);
+      console.log('EnvironmentRenderer: Background image loaded');
+    } catch {
+      console.error('EnvironmentRenderer: Background failed to load');
+    }
     
-    // Load animation frames (34 frames)
+    // Load animation frames (34 frames) - non-blocking
     for (let i = 0; i < 34; i++) {
       const frameIndex = i.toString().padStart(2, '0');
       const path = `${ARENA_ANIMATION_PATH}level_barbarian_arena_sprite_${frameIndex}.png`;
-      loadPromises.push(this.loadImage(path).then(img => {
+      this.loadImage(path).then(img => {
         this.animationFrames[i] = img;
-      }));
+      }).catch(err => {
+        console.warn(`EnvironmentRenderer: Frame ${i} failed:`, err);
+      });
     }
     
-    // Load decoration sprites (107 sprites)
+    // Load decoration sprites (107 sprites) - non-blocking
     for (let i = 0; i < 107; i++) {
       const spriteIndex = i.toString().padStart(3, '0');
       const path = `${DECOS_PATH}${spriteIndex}.png`;
-      loadPromises.push(this.loadImage(path).then(img => {
+      this.loadImage(path).then(img => {
         this.decosSprites.set(i, img);
-      }));
+      }).catch(() => {
+        // Silent fail for decorations
+      });
     }
     
-    await Promise.all(loadPromises);
-    this.isAssetsLoaded = true;
-    console.log('EnvironmentRenderer: All assets loaded');
+    // Mark as loaded after a short delay to ensure background is at least attempted
+    setTimeout(() => {
+      this.isAssetsLoaded = true;
+      console.log('EnvironmentRenderer: Assets marked as loaded', {
+        hasBackground: !!this.backgroundImage,
+        framesLoaded: this.animationFrames.filter(f => f).length,
+        decosLoaded: this.decosSprites.size
+      });
+    }, 100);
   }
   
   /**

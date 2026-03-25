@@ -8,8 +8,34 @@ interface TowerProps {
   tower: TowerType;
 }
 
-// Image cache for tower sprite
+// Image cache for tower sprite - load immediately when module loads
 let towerSpriteCache: HTMLImageElement | null = null;
+let spriteLoadingPromise: Promise<void> | null = null;
+
+function ensureSpriteLoaded(): Promise<void> {
+  if (towerSpriteCache) return Promise.resolve();
+  if (spriteLoadingPromise) return spriteLoadingPromise;
+  
+  spriteLoadingPromise = new Promise((resolve, reject) => {
+    console.log('Tower: Loading sprite from', TOWER_SPRITE_PATH);
+    const img = new Image();
+    img.onload = () => {
+      console.log('Tower: Sprite loaded!');
+      towerSpriteCache = img;
+      resolve();
+    };
+    img.onerror = (e) => {
+      console.error('Tower: Sprite FAILED to load', e);
+      reject(new Error('Failed to load tower sprite'));
+    };
+    img.src = TOWER_SPRITE_PATH;
+  });
+  
+  return spriteLoadingPromise;
+}
+
+// Preload sprite immediately
+ensureSpriteLoaded();
 
 const Tower: React.FC<TowerProps> = ({ tower }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -18,21 +44,13 @@ const Tower: React.FC<TowerProps> = ({ tower }) => {
 
   // Load tower sprite
   useEffect(() => {
-    if (towerSpriteCache) {
+    ensureSpriteLoaded().then(() => {
       spriteRef.current = towerSpriteCache;
       setSpriteLoaded(true);
-      return;
-    }
-
-    const img = new Image();
-    img.src = TOWER_SPRITE_PATH;
-    img.onload = () => {
-      towerSpriteCache = img;
-      spriteRef.current = img;
-      setSpriteLoaded(true);
-    };
-    img.onerror = () => {
-    };
+    }).catch(() => {
+      // Continue with fallback
+      setSpriteLoaded(false);
+    });
   }, []);
 
   // Draw tower on canvas
