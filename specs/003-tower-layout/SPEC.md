@@ -2,42 +2,56 @@
 
 **Date**: 2026-03-25
 **Project**: Clash Royale V2
-**Status**: Phase 1 - Asset Documentation
+**Status**: Phase 1 - Asset Review
 **Branch**: `001-official-assets-ui`
 
 ---
 
-## 1. Selected Assets (CONFIRMED)
+## 1. Official 2D Sprite Resources Found
 
-### 1.1 Background Arena (PENDING USER SELECTION)
+### 1.1 UI Arena Sprites (`ui_arena_out/`)
 
-Choose ONE of these arena backgrounds:
-
-| Arena | File | Size | Notes |
-|-------|------|------|-------|
-| Barbarian | `arenas/barbarian.png` | 365KB | Current default |
-| Training | `arenas/training.png` | 793KB | More structured |
-| Ice | `arenas/ice.png` | 743KB | Winter theme |
-| Jungle | `arenas/jungle.png` | 719KB | Forest theme |
+154 official UI arena sprites - likely contains arena tiles, bridges, decorations.
 
 **Preview:**
-- Barbarian: ![barbarian.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/arenas/barbarian.png)
-- Training: ![training.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/arenas/training.png)
-- Ice: ![ice.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/arenas/ice.png)
-- Jungle: ![jungle.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/arenas/jungle.png)
+- frame-000: ![frame-000](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/ui-arena/frame-000.png)
+- frame-050: ![frame-050](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/ui-arena/frame-050.png)
+- frame-075: ![frame-075](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/ui-arena/frame-075.png)
 
-**⚠️ ACTION REQUIRED**: User must select ONE background.
+**Full list**: `research/reference-assets/assets/sc/ui_arena_out/ui_arena_sprite_000.png` to `ui_arena_sprite_153.png`
 
 ---
 
-### 1.2 Tower Sprites (CONFIRMED)
+### 1.2 Arena Training Sprites (`arena_training_out/`)
+
+23 training arena sprites.
+
+**Preview:**
+- frame-00: ![frame-00](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/arena-training/frame-00.png)
+- frame-05: ![frame-05](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/arena-training/frame-05.png)
+
+**Full list**: `research/reference-assets/assets/sc/arena_training_out/arena_training_sprite_00.png` to `arena_training_sprite_22.png`
+
+---
+
+### 1.3 Barbarian Arena Sprites (`level_barbarian_arena_out/`)
+
+Barbarian arena sprites.
+
+**Preview:**
+- frame-00: ![frame-00](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/barbarian-arena/frame-00.png)
+- frame-05: ![frame-05](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/barbarian-arena/frame-05.png)
+
+**Full list**: `research/reference-assets/assets/sc/level_barbarian_arena_out/level_barbarian_arena_sprite_00.png` to `level_barbarian_arena_sprite_XX.png`
+
+---
+
+## 2. Tower Sprites (CONFIRMED)
 
 | Purpose | File | Source Frame |
 |---------|------|-------------|
 | Enemy King Tower | `tower-sprites/enemy-king-1.png` | building_tower_out frame 14 |
-| Enemy King Tower Alt | `tower-sprites/enemy-king-2.png` | building_tower_out frame 98 |
 | Enemy Princess | `tower-sprites/enemy-princess-1.png` | chr_princess_out frame 0 |
-| Enemy Princess Alt | `tower-sprites/enemy-princess-2.png` | chr_princess_out frame 100 |
 
 **Preview:**
 - King Tower: ![enemy-king-1.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/tower-sprites/enemy-king-1.png)
@@ -45,86 +59,13 @@ Choose ONE of these arena backgrounds:
 
 ---
 
-### 1.3 Decoration Sprites (TO BE SELECTED)
+## 3. Decoration Sprites
 
-Decoration sprites are in: `/public/assets/game/environment/decos/`
+Available in `/public/assets/game/environment/decos/level_decos_sprite_XXX.png`
 
-**Available Types:**
-- Trees: `level_decos_sprite_000.png` to `level_decos_sprite_015.png`
-- Bushes: `level_decos_sprite_016.png` to `level_decos_sprite_040.png`
-- Rocks: `level_decos_sprite_041.png` to `level_decos_sprite_060.png`
-- Flowers: `level_decos_sprite_061.png` to `level_decos_sprite_080.png`
-
-**Sample Decorations:**
-- Tree: ![tree-000.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/decorations/tree-000.png)
-- Bush: ![bush-016.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/decorations/bush-016.png)
-- Rock: ![rock-041.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/decorations/rock-041.png)
-
-**⚠️ DECISIONS NEEDED**:
-1. Select background arena
-2. Which decoration sprites to use (or none)?
-3. Should decorations be symmetric?
-
----
-
-### 1.4 Unit Sprites (TO BE IMPLEMENTED)
-
-Available in `/public/assets/game/units/`:
-
-| Unit | File | Dimensions |
-|------|------|------------|
-| Knight | `units/knight.png` | ~187x181 |
-| Archer | `units/archer.png` | ~130x135 |
-| Giant | `units/giant.png` | ~189x185 |
-
----
-
-### 1.5 River & Bridges (PROCEDURAL)
-
-**Decision**: Use procedural graphics or sprite-based?
-
-Current implementation:
-- River: Procedural blue rectangles with wave animation
-- Bridges: Procedural wooden bridge (fallback)
-
-**Alternative**: Use sprite from `level_decos_sprite_101.png` to `level_decos_sprite_106.png`
-
----
-
-## 2. Arena Layout
-
-**Canvas Size**: 506 x 832 (portrait)
-
-### Tower Positions
-
-| Tower ID | X | Y | Type |
-|----------|---|---|------|
-| enemy-king | 253 | 180 | King |
-| enemy-princess-left | 100 | 280 | Princess |
-| enemy-princess-right | 406 | 280 | Princess |
-| player-king | 253 | 650 | King |
-| player-princess-left | 100 | 552 | Princess |
-| player-princess-right | 406 | 552 | Princess |
-
-### River & Bridges
-
-- River: Y = 416, Height = 40px
-- Bridges: X = 126 and X = 380
-
----
-
-## 3. Rendering Layers
-
-```
-Layer 1: Base Color (fallback)
-Layer 2: Arena Background (SELECTED BACKGROUND)
-Layer 3: Decorations (SELECTED SPRITES) [OPTIONAL]
-Layer 4: River (procedural or sprite)
-Layer 5: Bridges (procedural or sprite)
-Layer 6: Units (knight, archer, giant) [FUTURE]
-Layer 7: Towers (king + princess overlay)
-Layer 8: Health Bars + UI
-```
+- Trees: 000-015
+- Bushes: 016-040
+- Rocks: 041-060
 
 ---
 
@@ -132,31 +73,18 @@ Layer 8: Health Bars + UI
 
 | Item | Options | Status |
 |------|---------|--------|
-| Background | barbarian / training / ice / jungle | ⏳ PENDING |
-| Decorations | Use sprites / Use none / Use simple | ⏳ PENDING |
-| River | Procedural / Sprite | ⏳ PENDING |
-| Bridges | Procedural / Sprite | ⏳ PENDING |
+| Arena Background | `ui_arena_out/` (154 sprites) / `arena_training_out/` (23 sprites) | ⏳ NEEDS REVIEW |
+| How to tile | Use as background or tile pattern? | ⏳ PENDING |
 
 ---
 
-## 5. Implementation Status
+## 5. Next Steps
 
-### Completed
-- ✅ Tower positions fixed
-- ✅ Tower sprites with princess overlay
-- ✅ Player/enemy flip logic
-
-### In Progress
-- 🔄 Background selection (need user input)
-- 🔄 Decoration selection (need user input)
-
-### TODO
-- ⏳ Implement selected background
-- ⏳ Implement decorations (if selected)
-- ⏳ River/Bridge implementation (procedural or sprite)
-- ⏳ Unit sprites (future)
+1. User reviews the preview images above
+2. Select which sprite set to use for arena background
+3. Determine how to tile/arrange the sprites
 
 ---
 
 *Last updated: 2026-03-25*
-*Awaiting: User background selection*
+*Awaiting: User selection of official sprite resources*
