@@ -1,70 +1,101 @@
-# SPEC: Tower Layout Fix
+# SPEC: Clash Royale V2 - Asset Specification
 
 **Date**: 2026-03-25
 **Project**: Clash Royale V2
-**Feature**: Correct Tower Placement and Unit Positioning
-**Status**: Phase 1 - Specification Confirmed
+**Status**: Phase 1 - Asset Documentation
+**Branch**: `001-official-assets-ui`
 
 ---
 
-## 1. Tower Sprite Strategy (CONFIRMED)
+## 1. Selected Assets (CONFIRMED)
 
-### 4 Key Tower Sprites (Keep These)
+### 1.1 Background Arena (PENDING USER SELECTION)
 
-| Sprite | File | Usage |
-|--------|------|-------|
-| Enemy King Tower | `anim-014.png` (frame 14) | Enemy king tower |
-| Enemy King Tower Alt | `anim-098.png` (frame 98) | Enemy king tower (alternate) |
-| Enemy Princess | `princess-000.png` (frame 0) | Enemy princess tower sprite |
-| Enemy Princess Alt | `princess-100.png` (frame 100) | Enemy princess tower sprite |
+Choose ONE of these arena backgrounds:
 
-### Player vs Enemy Towers
+| Arena | File | Size | Notes |
+|-------|------|------|-------|
+| Barbarian | `arenas/barbarian.png` | 365KB | Current default |
+| Training | `arenas/training.png` | 793KB | More structured |
+| Ice | `arenas/ice.png` | 743KB | Winter theme |
+| Jungle | `arenas/jungle.png` | 719KB | Forest theme |
 
-| Tower Type | Enemy | Player |
-|------------|-------|--------|
-| King Tower | `anim-014.png` (normal) | Same sprite + **horizontal flip** |
-| Princess Tower | `princess-000.png` (normal) | Same sprite + **horizontal flip** |
+**Preview:**
+- Barbarian: ![barbarian.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/arenas/barbarian.png)
+- Training: ![training.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/arenas/training.png)
+- Ice: ![ice.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/arenas/ice.png)
+- Jungle: ![jungle.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/arenas/jungle.png)
 
-**Rendering:**
-- Enemy towers: Draw sprite normally
-- Player towers: Draw sprite with `ctx.scale(-1, 1)` for horizontal mirror
-
-### Princess Overlay
-
-Princess sprite should be **drawn on top of** the tower sprite, slightly offset upward.
-
-**Composite Tower = King Tower Base + Princess Overlay**
+**⚠️ ACTION REQUIRED**: User must select ONE background.
 
 ---
 
-## 2. Arena Layout Reference
+### 1.2 Tower Sprites (CONFIRMED)
 
-### Canvas Dimensions
-- **Width**: 506 pixels
-- **Height**: 832 pixels
-- **Orientation**: Portrait (竖屏)
+| Purpose | File | Source Frame |
+|---------|------|-------------|
+| Enemy King Tower | `tower-sprites/enemy-king-1.png` | building_tower_out frame 14 |
+| Enemy King Tower Alt | `tower-sprites/enemy-king-2.png` | building_tower_out frame 98 |
+| Enemy Princess | `tower-sprites/enemy-princess-1.png` | chr_princess_out frame 0 |
+| Enemy Princess Alt | `tower-sprites/enemy-princess-2.png` | chr_princess_out frame 100 |
 
-### Arena Zones (from top to bottom)
-```
-Y: 0-180      → Enemy Territory
-Y: 180-280    → Enemy Princess Towers
-Y: 180        → Enemy King Tower (centered)
-Y: 280-380    → Enemy Lane Area
-Y: 380-452    → River Bank (north)
-Y: 416        → RIVER CENTER LINE
-Y: 452-524    → River Bank (south)
-Y: 552-652    → Player Lane Area
-Y: 552        → Player Princess Towers
-Y: 580-650    → Player King Tower (centered)
-Y: 652-832    → Player Territory
-```
+**Preview:**
+- King Tower: ![enemy-king-1.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/tower-sprites/enemy-king-1.png)
+- Princess: ![enemy-princess-1.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/tower-sprites/enemy-princess-1.png)
 
-### River Configuration
-- **Position**: Y = 416 (center)
-- **Height**: 40 pixels (Y: 396-436)
-- **Bridges**: X = 126 and X = 380
+---
 
-### Tower Positions (FIXED)
+### 1.3 Decoration Sprites (TO BE SELECTED)
+
+Decoration sprites are in: `/public/assets/game/environment/decos/`
+
+**Available Types:**
+- Trees: `level_decos_sprite_000.png` to `level_decos_sprite_015.png`
+- Bushes: `level_decos_sprite_016.png` to `level_decos_sprite_040.png`
+- Rocks: `level_decos_sprite_041.png` to `level_decos_sprite_060.png`
+- Flowers: `level_decos_sprite_061.png` to `level_decos_sprite_080.png`
+
+**Sample Decorations:**
+- Tree: ![tree-000.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/decorations/tree-000.png)
+- Bush: ![bush-016.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/decorations/bush-016.png)
+- Rock: ![rock-041.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/decorations/rock-041.png)
+
+**⚠️ DECISIONS NEEDED**:
+1. Select background arena
+2. Which decoration sprites to use (or none)?
+3. Should decorations be symmetric?
+
+---
+
+### 1.4 Unit Sprites (TO BE IMPLEMENTED)
+
+Available in `/public/assets/game/units/`:
+
+| Unit | File | Dimensions |
+|------|------|------------|
+| Knight | `units/knight.png` | ~187x181 |
+| Archer | `units/archer.png` | ~130x135 |
+| Giant | `units/giant.png` | ~189x185 |
+
+---
+
+### 1.5 River & Bridges (PROCEDURAL)
+
+**Decision**: Use procedural graphics or sprite-based?
+
+Current implementation:
+- River: Procedural blue rectangles with wave animation
+- Bridges: Procedural wooden bridge (fallback)
+
+**Alternative**: Use sprite from `level_decos_sprite_101.png` to `level_decos_sprite_106.png`
+
+---
+
+## 2. Arena Layout
+
+**Canvas Size**: 506 x 832 (portrait)
+
+### Tower Positions
 
 | Tower ID | X | Y | Type |
 |----------|---|---|------|
@@ -75,86 +106,57 @@ Y: 652-832    → Player Territory
 | player-princess-left | 100 | 552 | Princess |
 | player-princess-right | 406 | 552 | Princess |
 
----
+### River & Bridges
 
-## 3. Sprite Asset Paths
-
-### Tower Sprites (in public/assets/game/)
-```
-tower-sprites/
-├── enemy-king-1.png    (anim-014.png) - Enemy King Tower frame 14
-├── enemy-king-2.png    (anim-098.png) - Enemy King Tower frame 98
-├── enemy-princess-1.png (princess-000.png) - Enemy Princess frame 0
-└── enemy-princess-2.png (princess-100.png) - Enemy Princess frame 100
-```
-
-### Unit Sprites
-| Unit | Path |
-|------|------|
-| Knight | `/assets/game/units/knight.png` |
-| Archer | `/assets/game/units/archer.png` |
-| Giant | `/assets/game/units/giant.png` |
+- River: Y = 416, Height = 40px
+- Bridges: X = 126 and X = 380
 
 ---
 
-## 4. Rendering Layers
+## 3. Rendering Layers
 
 ```
-Layer 1: Base Color (#3d6b41)
-    ↓
-Layer 2: Arena Background (506x832 texture)
-    ↓
-Layer 3: Decorations (trees, bushes, rocks)
-    ↓
-Layer 4: River Water (procedural blue + waves)
-    ↓
-Layer 5: Bridges (sprite 101-106)
-    ↓
-Layer 6: Units (knight, archer, giant)
-    ↓
-Layer 7: Tower Base (king tower sprite)
-    ↓
-Layer 8: Princess Overlay (princess sprite on top of tower)
-    ↓
-Layer 9: Health Bars + UI
+Layer 1: Base Color (fallback)
+Layer 2: Arena Background (SELECTED BACKGROUND)
+Layer 3: Decorations (SELECTED SPRITES) [OPTIONAL]
+Layer 4: River (procedural or sprite)
+Layer 5: Bridges (procedural or sprite)
+Layer 6: Units (knight, archer, giant) [FUTURE]
+Layer 7: Towers (king + princess overlay)
+Layer 8: Health Bars + UI
 ```
 
 ---
 
-## 5. Implementation Tasks
+## 4. Pending Decisions
 
-### Task 1: Copy & Rename Tower Sprites
-- [ ] Copy `anim-014.png` → `enemy-king-1.png`
-- [ ] Copy `anim-098.png` → `enemy-king-2.png`
-- [ ] Copy `princess-000.png` → `enemy-princess-1.png`
-- [ ] Copy `princess-100.png` → `enemy-princess-2.png`
-
-### Task 2: Update Tower Rendering
-- [ ] Modify `Tower.tsx` to support player/enemy flip
-- [ ] Add princess overlay rendering
-- [ ] Composite: draw tower base, then princess on top
-
-### Task 3: Update Tower Positions
-- [ ] Fix App.tsx with correct 506x832 positions
-- [ ] Update bridge positions: X = 126 and X = 380
-
-### Task 4: Decoration Placement
-- [ ] Fix EnvironmentRenderer.ts decoration positions
-- [ ] Ensure symmetric placement
-- [ ] No overlap with river/towers
+| Item | Options | Status |
+|------|---------|--------|
+| Background | barbarian / training / ice / jungle | ⏳ PENDING |
+| Decorations | Use sprites / Use none / Use simple | ⏳ PENDING |
+| River | Procedural / Sprite | ⏳ PENDING |
+| Bridges | Procedural / Sprite | ⏳ PENDING |
 
 ---
 
-## 6. Acceptance Criteria
+## 5. Implementation Status
 
-1. ✅ Enemy towers render with normal orientation
-2. ✅ Player towers render with horizontal flip
-3. ✅ Princess sprite visible on top of tower sprite
-4. ✅ 6 towers at correct positions
-5. ✅ River at Y=416 with bridges at X=126, X=380
-6. ✅ Decorations symmetric and non-overlapping
+### Completed
+- ✅ Tower positions fixed
+- ✅ Tower sprites with princess overlay
+- ✅ Player/enemy flip logic
+
+### In Progress
+- 🔄 Background selection (need user input)
+- 🔄 Decoration selection (need user input)
+
+### TODO
+- ⏳ Implement selected background
+- ⏳ Implement decorations (if selected)
+- ⏳ River/Bridge implementation (procedural or sprite)
+- ⏳ Unit sprites (future)
 
 ---
 
 *Last updated: 2026-03-25*
-*Status: SPEC CONFIRMED by user*
+*Awaiting: User background selection*
