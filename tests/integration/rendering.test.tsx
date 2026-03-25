@@ -239,6 +239,8 @@ describe('Animation System', () => {
 
       // Advance past last frame
       const frameInterval = 1000 / config.fps;
+      // Simulate accumulated time that exceeds frame interval
+      state.frameTime = frameInterval;
       if (state.frameTime >= frameInterval) {
         state.currentFrame = (state.currentFrame + 1) % config.frames.length;
         state.frameTime = 0;
@@ -265,6 +267,8 @@ describe('Animation System', () => {
       };
 
       const frameInterval = 1000 / config.fps;
+      // Simulate accumulated time that exceeds frame interval
+      state.frameTime = frameInterval;
       if (state.frameTime >= frameInterval) {
         if (!config.loop && state.currentFrame >= config.frames.length - 1) {
           state.completed = true;
@@ -535,12 +539,12 @@ describe('Rendering Integration', () => {
       };
 
       const { rerender } = render(<Unit unit={unit} />);
-      expect(document.querySelector('.unit')).toHaveStyle({ left: 200, top: 300 });
+      expect(document.querySelector('.unit')).toHaveStyle({ left: '200px', top: '300px' });
 
       // Update position
       const movedUnit = { ...unit, position: { x: 250, y: 350 } };
       rerender(<Unit unit={movedUnit} />);
-      expect(document.querySelector('.unit')).toHaveStyle({ left: 250, top: 350 });
+      expect(document.querySelector('.unit')).toHaveStyle({ left: '250px', top: '350px' });
     });
 
     it('should transition unit state from idle to attacking', () => {

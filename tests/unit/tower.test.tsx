@@ -93,7 +93,7 @@ describe('Tower Rendering', () => {
       mockTower.position = { x: 250, y: 300 };
       render(<Tower tower={mockTower} />);
       const towerElement = document.querySelector('.tower');
-      expect(towerElement).toHaveStyle({ left: 250, top: 300 });
+      expect(towerElement).toHaveStyle({ left: '250px', top: '300px' });
     });
 
     it('should render tower health bar', () => {
@@ -186,7 +186,7 @@ describe('Tower Rendering', () => {
       };
       render(<Tower tower={princessTower} />);
       const towerElement = document.querySelector('.tower');
-      expect(towerElement).toHaveStyle({ left: 100, top: 200 });
+      expect(towerElement).toHaveStyle({ left: '100px', top: '200px' });
     });
 
     it('should render king tower at correct position', () => {
@@ -197,7 +197,7 @@ describe('Tower Rendering', () => {
       };
       render(<Tower tower={kingTower} />);
       const towerElement = document.querySelector('.tower.king');
-      expect(towerElement).toHaveStyle({ left: 360, top: 100 });
+      expect(towerElement).toHaveStyle({ left: '360px', top: '100px' });
     });
   });
 });

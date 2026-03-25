@@ -118,7 +118,7 @@ describe('Unit Rendering', () => {
       mockUnit.position = { x: 250, y: 350 };
       render(<Unit unit={mockUnit} />);
       const unitElement = document.querySelector('.unit');
-      expect(unitElement).toHaveStyle({ left: 250, top: 350 });
+      expect(unitElement).toHaveStyle({ left: '250px', top: '350px' });
     });
 
     it('should render unit health bar', () => {

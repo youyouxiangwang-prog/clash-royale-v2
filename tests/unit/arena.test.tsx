@@ -126,8 +126,8 @@ describe('Arena Rendering', () => {
 
   describe('Arena Dimensions', () => {
     it('should have proper aspect ratio for 9:16 portrait mode', () => {
-      const width = 720;
-      const height = 900;
+      const width = 540;
+      const height = 960;
       const aspectRatio = width / height;
       expect(Math.abs(aspectRatio - 9 / 16)).toBeLessThan(0.01);
     });
