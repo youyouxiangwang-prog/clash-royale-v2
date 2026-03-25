@@ -40,9 +40,15 @@ export class EnvironmentRenderer {
   async loadAssets(): Promise<void> {
     const loadPromises: Promise<void>[] = [];
     
+    console.log('EnvironmentRenderer: Starting to load assets...');
+    console.log('EnvironmentRenderer: Base path =', ARENA_BACKGROUND_PATH);
+    
     // Load background image
     loadPromises.push(this.loadImage(ARENA_BACKGROUND_PATH).then(img => {
       this.backgroundImage = img;
+      console.log('EnvironmentRenderer: Background loaded', img.width, 'x', img.height);
+    }).catch(err => {
+      console.error('EnvironmentRenderer: Background failed to load:', err);
     }));
     
     // Load animation frames (34 frames)
@@ -51,6 +57,8 @@ export class EnvironmentRenderer {
       const path = `${ARENA_ANIMATION_PATH}level_barbarian_arena_sprite_${frameIndex}.png`;
       loadPromises.push(this.loadImage(path).then(img => {
         this.animationFrames[i] = img;
+      }).catch(err => {
+        console.warn('EnvironmentRenderer: Frame', i, 'failed:', err);
       }));
     }
     
@@ -60,12 +68,19 @@ export class EnvironmentRenderer {
       const path = `${DECOS_PATH}${spriteIndex}.png`;
       loadPromises.push(this.loadImage(path).then(img => {
         this.decosSprites.set(i, img);
+      }).catch(err => {
+        console.warn('EnvironmentRenderer: Deco', i, 'failed:', err);
       }));
     }
     
-    await Promise.all(loadPromises);
+    const results = await Promise.allSettled(loadPromises);
+    const fulfilled = results.filter(r => r.status === 'fulfilled').length;
+    const rejected = results.filter(r => r.status === 'rejected').length;
+    
+    console.log(`EnvironmentRenderer: Load complete - ${fulfilled} succeeded, ${rejected} failed`);
+    console.log('EnvironmentRenderer: backgroundImage =', this.backgroundImage ? 'SET' : 'NULL');
+    
     this.isAssetsLoaded = true;
-    console.log('EnvironmentRenderer: All assets loaded');
   }
   
   /**
@@ -74,8 +89,14 @@ export class EnvironmentRenderer {
   private loadImage(src: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
+      img.onload = () => {
+        console.log('EnvironmentRenderer: Loaded', src, img.width, 'x', img.height);
+        resolve(img);
+      };
+      img.onerror = () => {
+        console.error('EnvironmentRenderer: FAILED to load', src);
+        reject(new Error(`Failed to load image: ${src}`));
+      };
       img.src = src;
     });
   }
@@ -236,11 +257,19 @@ export class EnvironmentRenderer {
   renderBase(ctx: CanvasRenderingContext2D): void {
     const { width, height } = this.config;
     
+    console.log('EnvironmentRenderer: renderBase called', {
+      hasBackgroundImage: !!this.backgroundImage,
+      isAssetsLoaded: this.isAssetsLoaded,
+      canvasSize: width, height
+    });
+    
     if (this.backgroundImage && this.isAssetsLoaded) {
       // Draw background scaled to fit canvas
+      console.log('EnvironmentRenderer: Drawing background image');
       ctx.drawImage(this.backgroundImage, 0, 0, width, height);
     } else {
       // Fallback: grass gradient
+      console.log('EnvironmentRenderer: Using FALLBACK gradient (assets not ready)');
       const gradient = ctx.createLinearGradient(0, 0, 0, height);
       gradient.addColorStop(0, '#4a7c4e');
       gradient.addColorStop(0.5, '#3d6b41');
