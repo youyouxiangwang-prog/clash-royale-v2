@@ -62,8 +62,27 @@ Y: 652-832    → Player Territory
 ### Tower Sprites
 | Asset | Path | Dimensions | Notes |
 |-------|------|-----------|-------|
-| King Tower | `/assets/game/tower.png` | 407x471 | Main tower sprite |
-| Building Tower Tex | `/assets/game/building_tower_tex.png` | 1982x2542 | Texture atlas |
+| King Tower | `/assets/game/tower.png` | 407x471 | Single tower sprite |
+| Building Tower Tex | `/assets/game/building_tower_tex.png` | 1982x2542 | Texture atlas (NOT USED) |
+| Tower Animation | `building_tower_out/*.png` | 407x471 | 214 animation frames |
+| Princess Tower | Reference only | - | `building_tower_out/` |
+
+### ⚠️ Tower Sprite Analysis
+
+**问题：当前只有一个 `tower.png`**
+
+真实 Clash Royale 中：
+- **敌方塔**：玩家从外部看，看到塔的正面（有炮口朝向玩家）
+- **我方塔**：玩家从内部看，看到塔的背面（无炮口可见）
+
+**当前解决方案：**
+- 使用同一张 `tower.png`
+- 敌方塔：正常显示
+- 我方塔：水平翻转 (`ctx.scale(-1, 1)`)
+
+**需要验证：**
+- `tower.png` 是否有明显的正面/背面之分？
+- `building_tower_out/` 的 214 帧是否包含前视/后视？
 
 ### Unit Sprites
 | Unit | Path | Dimensions |
@@ -174,7 +193,18 @@ Scattered Rocks:
 6. ✅ No decoration overlapping towers or river
 7. ✅ All sprites loading and displaying correctly
 8. ✅ Consistent 60fps performance
+9. ⚠️ Player vs Enemy tower differentiation (flip or different sprite)
+
+---
+
+## 9. Open Questions
+
+- [ ] Does `tower.png` show clear front vs back of tower?
+- [ ] Should we use `building_tower_out/214frames` for tower animation?
+- [ ] Are princess towers different from king towers visually?
+- [ ] Need to verify player tower "back view" is acceptable
 
 ---
 
 *Last updated: 2026-03-25*
+*Needs: User confirmation on tower sprite approach*
