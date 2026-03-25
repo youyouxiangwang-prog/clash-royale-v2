@@ -5,10 +5,11 @@ import {
   isInAvoidZone,
 } from './types/environment';
 
-// Asset paths
-const ARENA_BACKGROUND_PATH = 'assets/game/arena_background.png';
-const ARENA_ANIMATION_PATH = 'assets/game/arena_animation/';
-const DECOS_PATH = 'assets/game/environment/decos/level_decos_sprite_';
+// Asset paths - use absolute paths from domain root
+const ASSET_BASE = '/assets/game/';
+const ARENA_BACKGROUND_PATH = ASSET_BASE + 'arena_background.png';
+const ARENA_ANIMATION_PATH = ASSET_BASE + 'arena_animation/';
+const DECOS_PATH = ASSET_BASE + 'environment/decos/level_decos_sprite_';
 
 export class EnvironmentRenderer {
   // Configuration

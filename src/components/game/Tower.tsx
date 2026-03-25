@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import type { Tower as TowerType } from '../../types';
 
 // Tower sprite constants
-const TOWER_SPRITE_PATH = 'assets/game/tower.png';
+const TOWER_SPRITE_PATH = '/assets/game/tower.png';
 
 interface TowerProps {
   tower: TowerType;
