@@ -1,3 +1,15 @@
+/**
+ * EnvironmentRenderer - Layered Environment Rendering System
+ * 
+ * Renders the game arena background with proper layer ordering:
+ * Layer 1: Arena Base (solid color fallback)
+ * Layer 2: Static Arena Background (grass texture)
+ * Layer 3: Decorative Elements (trees, bushes, rocks)
+ * Layer 4: Animated Arena (water frame overlays)
+ * Layer 5: River (procedural water with waves)
+ * Layer 6: Bridges (sprite or procedural)
+ */
+
 import {
   DecorationPlacement,
   ArenaConfig,
@@ -5,301 +17,79 @@ import {
   isInAvoidZone,
 } from './types/environment';
 
-// Asset paths - use absolute paths from domain root
+// Asset paths
 const ASSET_BASE = '/assets/game/';
 const ARENA_BACKGROUND_PATH = ASSET_BASE + 'arena_background.png';
-const ARENA_ANIMATION_PATH = ASSET_BASE + 'arena_animation/';
+const ARENA_ANIMATION_PATH = ASSET_BASE + 'arena_animation/level_barbarian_arena_sprite_';
 const DECOS_PATH = ASSET_BASE + 'environment/decos/level_decos_sprite_';
 
 export class EnvironmentRenderer {
   // Configuration
   private config: ArenaConfig;
   
-  // Assets
+  // === LAYER 2: Background Image ===
   private backgroundImage: HTMLImageElement | null = null;
-  private animationFrames: HTMLImageElement[] = [];
-  private decosSprites: Map<number, HTMLImageElement> = new Map();
   
-  // Animation state
+  // === LAYER 4: Animation Frames (water effects) ===
+  private animationFrames: HTMLImageElement[] = [];
   private currentFrame: number = 0;
   private animationTime: number = 0;
-  private isAssetsLoaded: boolean = false;
   
-  // Decorations
+  // === LAYER 3: Decorations ===
+  private decosSprites: Map<number, HTMLImageElement> = new Map();
   private decorations: DecorationPlacement[] = [];
   
-  // River animation
+  // === LAYER 5: River Animation ===
   private riverTime: number = 0;
+  
+  // === State ===
+  private assetsLoaded: boolean = false;
   
   constructor(config: ArenaConfig) {
     this.config = config;
   }
   
   /**
-   * Load all environment assets
+   * LAYER 1: Render solid color base (fallback)
    */
-  async loadAssets(): Promise<void> {
-    // Skip if already loaded
-    if (this.isAssetsLoaded) {
-      console.log('EnvironmentRenderer: Assets already loaded');
-      return;
-    }
-    
-    console.log('EnvironmentRenderer: Starting asset load...');
-    
-    // Load background image first (critical)
-    try {
-      this.backgroundImage = await this.loadImage(ARENA_BACKGROUND_PATH);
-      console.log('EnvironmentRenderer: Background image loaded');
-    } catch {
-      console.error('EnvironmentRenderer: Background failed to load');
-    }
-    
-    // Load animation frames (34 frames) - non-blocking
-    for (let i = 0; i < 34; i++) {
-      const frameIndex = i.toString().padStart(2, '0');
-      const path = `${ARENA_ANIMATION_PATH}level_barbarian_arena_sprite_${frameIndex}.png`;
-      this.loadImage(path).then(img => {
-        this.animationFrames[i] = img;
-      }).catch(err => {
-        console.warn(`EnvironmentRenderer: Frame ${i} failed:`, err);
-      });
-    }
-    
-    // Load decoration sprites (107 sprites) - non-blocking
-    for (let i = 0; i < 107; i++) {
-      const spriteIndex = i.toString().padStart(3, '0');
-      const path = `${DECOS_PATH}${spriteIndex}.png`;
-      this.loadImage(path).then(img => {
-        this.decosSprites.set(i, img);
-      }).catch(() => {
-        // Silent fail for decorations
-      });
-    }
-    
-    // Mark as loaded after a short delay to ensure background is at least attempted
-    setTimeout(() => {
-      this.isAssetsLoaded = true;
-      console.log('EnvironmentRenderer: Assets marked as loaded', {
-        hasBackground: !!this.backgroundImage,
-        framesLoaded: this.animationFrames.filter(f => f).length,
-        decosLoaded: this.decosSprites.size
-      });
-    }, 100);
-  }
-  
-  /**
-   * Load a single image
-   */
-  private loadImage(src: string): Promise<HTMLImageElement> {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
-      img.src = src;
-    });
-  }
-  
-  /**
-   * Check if assets are loaded
-   */
-  isReady(): boolean {
-    return this.isAssetsLoaded;
-  }
-  
-  /**
-   * Generate default decoration placement
-   * Places trees, bushes, rocks in a realistic Clash Royale style layout
-   * Uses symmetric placement and avoids lanes/towers
-   * Optimized for 506x832 portrait arena
-   */
-  generateDefaultDecorations(): void {
+  renderLayer1_Base(ctx: CanvasRenderingContext2D): void {
     const { width, height } = this.config;
-    const avoidZones = getDefaultAvoidZones(this.config);
-    const decorations: DecorationPlacement[] = [];
-    
-    // River is at height/2, riverHeight ~40
-    // Bridges at width*0.25 and width*0.75
-    
-    // Helper to check if position is valid
-    const isValidPosition = (x: number, y: number, margin: number = 40): boolean => {
-      // Check avoid zones
-      if (isInAvoidZone(x, y, avoidZones)) return false;
-      
-      // Check distance from other decorations
-      for (const deco of decorations) {
-        const dist = Math.sqrt((x - deco.x) ** 2 + (y - deco.y) ** 2);
-        if (dist < margin) return false;
-      }
-      
-      // Check bounds - keep decorations away from edges
-      if (x < 30 || x > width - 30 || y < 30 || y > height - 30) return false;
-      
-      return true;
-    };
-    
-    // Helper to add decoration with mirror symmetry (left/right)
-    const addSymmetricDecoration = (x: number, y: number, spriteIndex: number, scale: number) => {
-      const mirrorX = width - x;
-      
-      if (isValidPosition(x, y, 35)) {
-        decorations.push({
-          spriteIndex,
-          x,
-          y,
-          scale,
-          flip: x > width / 2, // Face inward toward center
-        });
-      }
-      
-      if (isValidPosition(mirrorX, y, 35)) {
-        decorations.push({
-          spriteIndex,
-          x: mirrorX,
-          y,
-          scale,
-          flip: mirrorX > width / 2,
-        });
-      }
-    };
-    
-    // === TREES (0-15): Place in corners and along edges ===
-    // Top corners (enemy side)
-    addSymmetricDecoration(50, 70, 0, 0.85);
-    addSymmetricDecoration(85, 50, 1, 0.8);
-    addSymmetricDecoration(35, 110, 2, 0.75);
-    
-    // Bottom corners (player side)
-    addSymmetricDecoration(50, height - 70, 3, 0.85);
-    addSymmetricDecoration(85, height - 50, 4, 0.8);
-    addSymmetricDecoration(35, height - 110, 5, 0.75);
-    
-    // Mid-left and mid-right edges
-    addSymmetricDecoration(45, height * 0.35, 6, 0.7);
-    addSymmetricDecoration(45, height * 0.65, 7, 0.7);
-    
-    // === BUSHES (16-40): Place near lane edges and corners ===
-    // Near enemy towers (top)
-    addSymmetricDecoration(100, 90, 16, 0.6);
-    addSymmetricDecoration(150, 110, 17, 0.55);
-    
-    // Near player towers (bottom)
-    addSymmetricDecoration(100, height - 90, 18, 0.6);
-    addSymmetricDecoration(150, height - 110, 19, 0.55);
-    
-    // Along river banks (above and below river)
-    addSymmetricDecoration(70, height * 0.42, 20, 0.5);
-    addSymmetricDecoration(70, height * 0.58, 21, 0.5);
-    
-    // Scattered bushes in grass areas
-    for (let i = 0; i < 4; i++) {
-      const baseX = 80 + i * 35;
-      const baseY = height * 0.2 + (i % 2) * height * 0.6;
-      addSymmetricDecoration(baseX, baseY, 22 + i, 0.5 + Math.random() * 0.15);
-    }
-    
-    // === ROCKS (41-60): Scatter in grass areas ===
-    const rockPositions = [
-      { x: 120, y: 160 }, { x: 160, y: 200 },
-      { x: 80, y: height * 0.28 }, { x: 120, y: height * 0.32 },
-      { x: 120, y: height - 160 }, { x: 160, y: height - 200 },
-      { x: 80, y: height * 0.72 }, { x: 120, y: height * 0.68 },
-    ];
-    
-    for (let i = 0; i < rockPositions.length; i++) {
-      const pos = rockPositions[i];
-      addSymmetricDecoration(pos.x, pos.y, 41 + (i % 10), 0.55 + Math.random() * 0.15);
-    }
-    
-    // === FLOWERS/PLANTS (61-80): Small decorative elements ===
-    const flowerPositions = [
-      { x: 170, y: 130 }, { x: 210, y: 160 },
-      { x: 170, y: height - 130 }, { x: 210, y: height - 160 },
-    ];
-    
-    for (let i = 0; i < flowerPositions.length; i++) {
-      const pos = flowerPositions[i];
-      addSymmetricDecoration(pos.x, pos.y, 61 + i, 0.4);
-    }
-    
-    this.decorations = decorations;
-    console.log(`EnvironmentRenderer: Generated ${decorations.length} decorations (symmetric layout for ${width}x${height})`);
+    ctx.fillStyle = '#3d6b41'; // Default grass green
+    ctx.fillRect(0, 0, width, height);
   }
   
   /**
-   * Get current decorations
+   * LAYER 2: Render static arena background
    */
-  getDecorations(): DecorationPlacement[] {
-    return this.decorations;
-  }
-  
-  /**
-   * Update animation state
-   */
-  update(deltaTime: number): void {
-    if (!this.isAssetsLoaded) return;
-    
-    // Update animation frame (cycle through 34 frames at ~1 fps for subtle animation)
-    this.animationTime += deltaTime;
-    if (this.animationTime > 0.1) { // ~10fps frame rate for background animation
-      this.animationTime = 0;
-      this.currentFrame = (this.currentFrame + 1) % this.animationFrames.length;
-    }
-    
-    // Update river animation
-    this.riverTime += deltaTime;
-  }
-  
-  /**
-   * Render base arena background
-   */
-  renderBase(ctx: CanvasRenderingContext2D): void {
+  async renderLayer2_Background(ctx: CanvasRenderingContext2D): Promise<void> {
     const { width, height } = this.config;
     
-    if (this.backgroundImage && this.isAssetsLoaded) {
-      // Draw background scaled to fit canvas
+    if (!this.backgroundImage) {
+      // Try to load background if not loaded
+      try {
+        this.backgroundImage = await this.loadImage(ARENA_BACKGROUND_PATH);
+      } catch {
+        console.warn('Background not available, using gradient');
+        const gradient = ctx.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, '#4a7c4e');
+        gradient.addColorStop(0.5, '#3d6b41');
+        gradient.addColorStop(1, '#4a7c4e');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+        return;
+      }
+    }
+    
+    if (this.backgroundImage) {
       ctx.drawImage(this.backgroundImage, 0, 0, width, height);
-    } else {
-      // Fallback: grass gradient
-      const gradient = ctx.createLinearGradient(0, 0, 0, height);
-      gradient.addColorStop(0, '#4a7c4e');
-      gradient.addColorStop(0.5, '#3d6b41');
-      gradient.addColorStop(1, '#4a7c4e');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, width, height);
     }
   }
   
   /**
-   * Render animated layer (water effects from frames)
+   * LAYER 3: Render decorative elements (trees, bushes, rocks)
    */
-  renderAnimatedLayer(ctx: CanvasRenderingContext2D): void {
-    const { width, riverY, riverHeight } = this.config;
-    
-    if (!this.isAssetsLoaded) return;
-    
-    // If we have animation frames, draw the current frame for the river area
-    if (this.animationFrames[this.currentFrame]) {
-      // Only draw the center portion (river area) from animation frame
-      // The arena animation frames contain water ripple effects
-      ctx.save();
-      ctx.globalAlpha = 0.3; // Subtle overlay effect
-      ctx.drawImage(
-        this.animationFrames[this.currentFrame],
-        0, riverY - riverHeight/2,
-        width, riverHeight,
-        0, riverY - riverHeight/2,
-        width, riverHeight
-      );
-      ctx.restore();
-    }
-  }
-  
-  /**
-   * Render decorative elements
-   */
-  renderDecorations(ctx: CanvasRenderingContext2D): void {
-    if (!this.isAssetsLoaded) return;
+  async renderLayer3_Decorations(ctx: CanvasRenderingContext2D): Promise<void> {
+    if (this.decorations.length === 0) return;
     
     for (const deco of this.decorations) {
       const sprite = this.decosSprites.get(deco.spriteIndex);
@@ -325,41 +115,67 @@ export class EnvironmentRenderer {
   }
   
   /**
-   * Render river with procedural wave animation
+   * LAYER 4: Render animated arena (water frame overlay)
    */
-  renderRiver(ctx: CanvasRenderingContext2D): void {
+  renderLayer4_AnimatedOverlay(ctx: CanvasRenderingContext2D): void {
     const { width, riverY, riverHeight } = this.config;
     
-    // Base water color
+    // Only draw if we have animation frames
+    if (!this.animationFrames[this.currentFrame]) return;
+    
+    // The animation frames are large arena sprites with water effects
+    // We only want to show the river portion
+    const frame = this.animationFrames[this.currentFrame];
+    
+    // Draw the frame but only for the river area
+    ctx.save();
+    ctx.globalAlpha = 0.4; // Subtle overlay
+    
+    // Source: full frame
+    // Dest: only river band
+    ctx.drawImage(
+      frame,
+      0, 0, frame.width, frame.height,  // Source rect (full frame)
+      0, riverY - riverHeight / 2, width, riverHeight  // Dest rect (river area)
+    );
+    
+    ctx.restore();
+  }
+  
+  /**
+   * LAYER 5: Render procedural river with waves
+   */
+  renderLayer5_River(ctx: CanvasRenderingContext2D): void {
+    const { width, riverY, riverHeight } = this.config;
     const riverTop = riverY - riverHeight / 2;
     
-    // Draw base water
+    // Base water color
     ctx.fillStyle = '#3a6ad9';
     ctx.fillRect(0, riverTop, width, riverHeight);
     
-    // Add darker edges
+    // Darker edges gradient
     const edgeGradient = ctx.createLinearGradient(0, riverTop, 0, riverTop + riverHeight);
-    edgeGradient.addColorStop(0, 'rgba(0,0,0,0.3)');
+    edgeGradient.addColorStop(0, 'rgba(0,0,0,0.25)');
     edgeGradient.addColorStop(0.2, 'rgba(0,0,0,0)');
     edgeGradient.addColorStop(0.8, 'rgba(0,0,0,0)');
-    edgeGradient.addColorStop(1, 'rgba(0,0,0,0.3)');
+    edgeGradient.addColorStop(1, 'rgba(0,0,0,0.25)');
     ctx.fillStyle = edgeGradient;
     ctx.fillRect(0, riverTop, width, riverHeight);
     
     // Animated wave lines
-    const waveCount = 8;
+    const waveCount = 6;
     for (let i = 0; i < waveCount; i++) {
-      const yOffset = (this.riverTime * 40 + i * 30) % riverHeight;
+      const yOffset = (this.riverTime * 30 + i * 25) % riverHeight;
       const waveY = riverTop + yOffset;
       
       if (waveY < riverTop || waveY > riverTop + riverHeight) continue;
       
-      ctx.strokeStyle = `rgba(100, 181, 246, ${0.4 - i * 0.04})`;
+      ctx.strokeStyle = `rgba(100, 181, 246, ${0.35 - i * 0.05})`;
       ctx.lineWidth = 2;
       ctx.beginPath();
       
       for (let x = 0; x < width; x += 8) {
-        const wave = Math.sin((x + this.riverTime * 80) * 0.03) * 3;
+        const wave = Math.sin((x + this.riverTime * 60) * 0.025) * 2.5;
         const y = waveY + wave;
         if (x === 0) {
           ctx.moveTo(x, y);
@@ -372,68 +188,205 @@ export class EnvironmentRenderer {
   }
   
   /**
-   * Render bridges at specified positions
+   * LAYER 6: Render bridges
    */
-  renderBridges(ctx: CanvasRenderingContext2D): void {
+  renderLayer6_Bridges(ctx: CanvasRenderingContext2D): void {
     const { bridgePositions } = this.config;
     
-    if (!this.isAssetsLoaded) return;
-    
-    // Use bridge sprite (index 101) or fallback
+    // Try bridge sprite first (index 101)
     const bridgeSprite = this.decosSprites.get(101);
     
     for (const pos of bridgePositions) {
       if (bridgeSprite) {
-        const scale = 0.8;
+        // Draw bridge sprite
+        const scale = 1.0;
         const w = bridgeSprite.width * scale;
         const h = bridgeSprite.height * scale;
-        ctx.drawImage(bridgeSprite, pos.x - w/2, pos.y - h/2, w, h);
+        ctx.drawImage(bridgeSprite, pos.x - w / 2, pos.y - h / 2, w, h);
       } else {
-        // Fallback: wooden bridge
-        const bridgeWidth = 80;
-        const bridgeHeight = 50;
-        
-        // Bridge deck
-        const deckGradient = ctx.createLinearGradient(
-          pos.x - bridgeWidth/2, pos.y - bridgeHeight/2,
-          pos.x + bridgeWidth/2, pos.y + bridgeHeight/2
-        );
-        deckGradient.addColorStop(0, '#8b6914');
-        deckGradient.addColorStop(0.5, '#a67c00');
-        deckGradient.addColorStop(1, '#8b6914');
-        
-        ctx.fillStyle = deckGradient;
-        ctx.fillRect(pos.x - bridgeWidth/2, pos.y - bridgeHeight/2, bridgeWidth, bridgeHeight);
-        
-        // Wood planks
-        ctx.strokeStyle = '#5c4510';
-        ctx.lineWidth = 1;
-        for (let i = 0; i < 5; i++) {
-          const plankX = pos.x - bridgeWidth/2 + (i + 0.5) * (bridgeWidth / 5);
-          ctx.beginPath();
-          ctx.moveTo(plankX, pos.y - bridgeHeight/2);
-          ctx.lineTo(plankX, pos.y + bridgeHeight/2);
-          ctx.stroke();
-        }
-        
-        // Rails
-        ctx.fillStyle = '#c9a227';
-        ctx.fillRect(pos.x - bridgeWidth/2 - 3, pos.y - bridgeHeight/2 - 5, bridgeWidth + 6, 4);
-        ctx.fillRect(pos.x - bridgeWidth/2 - 3, pos.y + bridgeHeight/2 + 1, bridgeWidth + 6, 4);
+        // Fallback: procedural wooden bridge
+        this.drawProceduralBridge(ctx, pos.x, pos.y);
       }
     }
   }
   
   /**
-   * Render everything (convenience method)
+   * Draw a procedural bridge as fallback
    */
-  render(ctx: CanvasRenderingContext2D, deltaTime: number): void {
+  private drawProceduralBridge(ctx: CanvasRenderingContext2D, x: number, y: number): void {
+    const bridgeWidth = 70;
+    const bridgeHeight = 40;
+    
+    // Bridge deck
+    const deckGradient = ctx.createLinearGradient(
+      x - bridgeWidth / 2, y - bridgeHeight / 2,
+      x + bridgeWidth / 2, y + bridgeHeight / 2
+    );
+    deckGradient.addColorStop(0, '#8b6914');
+    deckGradient.addColorStop(0.5, '#a67c00');
+    deckGradient.addColorStop(1, '#8b6914');
+    
+    ctx.fillStyle = deckGradient;
+    ctx.fillRect(x - bridgeWidth / 2, y - bridgeHeight / 2, bridgeWidth, bridgeHeight);
+    
+    // Wood planks
+    ctx.strokeStyle = '#5c4510';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 5; i++) {
+      const plankX = x - bridgeWidth / 2 + (i + 0.5) * (bridgeWidth / 5);
+      ctx.beginPath();
+      ctx.moveTo(plankX, y - bridgeHeight / 2);
+      ctx.lineTo(plankX, y + bridgeHeight / 2);
+      ctx.stroke();
+    }
+    
+    // Rails
+    ctx.fillStyle = '#c9a227';
+    ctx.fillRect(x - bridgeWidth / 2 - 2, y - bridgeHeight / 2 - 4, bridgeWidth + 4, 3);
+    ctx.fillRect(x - bridgeWidth / 2 - 2, y + bridgeHeight / 2 + 1, bridgeWidth + 4, 3);
+  }
+  
+  /**
+   * Load a single image
+   */
+  private loadImage(src: string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error(`Failed to load: ${src}`));
+      img.src = src;
+    });
+  }
+  
+  /**
+   * Load all assets (non-blocking)
+   */
+  async loadAssets(): Promise<void> {
+    if (this.assetsLoaded) return;
+    
+    console.log('EnvironmentRenderer: Loading assets...');
+    
+    // Load background (critical)
+    try {
+      this.backgroundImage = await this.loadImage(ARENA_BACKGROUND_PATH);
+      console.log('EnvironmentRenderer: Background loaded');
+    } catch (e) {
+      console.error('EnvironmentRenderer: Background failed');
+    }
+    
+    // Load animation frames
+    for (let i = 0; i < 34; i++) {
+      const frameIndex = i.toString().padStart(2, '0');
+      this.loadImage(`${ARENA_ANIMATION_PATH}${frameIndex}.png`).then(img => {
+        this.animationFrames[i] = img;
+      }).catch(() => {});
+    }
+    
+    // Load decoration sprites (indices 0-106)
+    for (let i = 0; i < 107; i++) {
+      const spriteIndex = i.toString().padStart(3, '0');
+      this.loadImage(`${DECOS_PATH}${spriteIndex}.png`).then(img => {
+        this.decosSprites.set(i, img);
+      }).catch(() => {});
+    }
+    
+    this.assetsLoaded = true;
+    console.log('EnvironmentRenderer: Assets loading in background');
+  }
+  
+  /**
+   * Generate default decoration placement
+   */
+  generateDefaultDecorations(): void {
+    const { width, height } = this.config;
+    const avoidZones = getDefaultAvoidZones(this.config);
+    this.decorations = [];
+    
+    const isValidPosition = (x: number, y: number, margin: number = 35): boolean => {
+      if (isInAvoidZone(x, y, avoidZones)) return false;
+      for (const deco of this.decorations) {
+        const dist = Math.sqrt((x - deco.x) ** 2 + (y - deco.y) ** 2);
+        if (dist < margin) return false;
+      }
+      if (x < 30 || x > width - 30 || y < 30 || y > height - 30) return false;
+      return true;
+    };
+    
+    const addSymmetric = (x: number, y: number, spriteIndex: number, scale: number) => {
+      const mirrorX = width - x;
+      if (isValidPosition(x, y)) {
+        this.decorations.push({ spriteIndex, x, y, scale, flip: x > width / 2 });
+      }
+      if (isValidPosition(mirrorX, y)) {
+        this.decorations.push({ spriteIndex, x: mirrorX, y, scale, flip: mirrorX > width / 2 });
+      }
+    };
+    
+    // Trees in corners
+    addSymmetric(45, 65, 0, 0.85);
+    addSymmetric(80, 45, 1, 0.8);
+    addSymmetric(35, 105, 2, 0.75);
+    addSymmetric(45, height - 65, 3, 0.85);
+    addSymmetric(80, height - 45, 4, 0.8);
+    addSymmetric(35, height - 105, 5, 0.75);
+    
+    // Bushes near lanes
+    addSymmetric(95, 85, 16, 0.6);
+    addSymmetric(145, 105, 17, 0.55);
+    addSymmetric(95, height - 85, 18, 0.6);
+    addSymmetric(145, height - 105, 19, 0.55);
+    
+    // Rocks scattered
+    addSymmetric(115, 155, 41, 0.55);
+    addSymmetric(155, 195, 42, 0.5);
+    addSymmetric(115, height - 155, 43, 0.55);
+    addSymmetric(155, height - 195, 44, 0.5);
+    
+    console.log(`EnvironmentRenderer: ${this.decorations.length} decorations placed`);
+  }
+  
+  /**
+   * Update animation state
+   */
+  update(deltaTime: number): void {
+    // Animate water frames
+    this.animationTime += deltaTime;
+    if (this.animationTime > 0.08) { // ~12fps
+      this.animationTime = 0;
+      this.currentFrame = (this.currentFrame + 1) % 34;
+    }
+    
+    // Animate river
+    this.riverTime += deltaTime;
+  }
+  
+  /**
+   * Render all layers in order
+   */
+  async render(ctx: CanvasRenderingContext2D, deltaTime: number): Promise<void> {
     this.update(deltaTime);
-    this.renderBase(ctx);
-    this.renderAnimatedLayer(ctx);
-    this.renderDecorations(ctx);
-    this.renderRiver(ctx);
-    this.renderBridges(ctx);
+    
+    // Layer 1: Base
+    this.renderLayer1_Base(ctx);
+    
+    // Layer 2: Background
+    await this.renderLayer2_Background(ctx);
+    
+    // Layer 3: Decorations
+    await this.renderLayer3_Decorations(ctx);
+    
+    // Layer 4: Animated overlay
+    this.renderLayer4_AnimatedOverlay(ctx);
+    
+    // Layer 5: River
+    this.renderLayer5_River(ctx);
+    
+    // Layer 6: Bridges
+    this.renderLayer6_Bridges(ctx);
+  }
+  
+  isReady(): boolean {
+    return this.assetsLoaded;
   }
 }
 
