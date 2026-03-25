@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import type { Tower as TowerType, Unit as UnitType } from '../../types';
-import { drawTower } from './Tower';
+import { drawTower, preloadTowerSprites } from './Tower';
 import { drawUnit } from './Unit';
 import { EnvironmentRenderer } from '../../engine/EnvironmentRenderer';
 import type { ArenaConfig } from '../../engine/types/environment';
@@ -22,21 +22,21 @@ const Arena: React.FC<ArenaProps> = ({
   const envRendererRef = useRef<EnvironmentRenderer | null>(null);
   const animationRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
-  const isReadyRef = useRef(false);
 
-  // Bridge positions
+  // River configuration: Y = 416, bridges at X = 126 and X = 380
+  const riverY = 416;
+  const riverHeight = 40;
   const bridgePositions = [
-    { x: width * 0.25, y: height / 2 },
-    { x: width * 0.75, y: height / 2 },
+    { x: 126, y: riverY },
+    { x: 380, y: riverY },
   ];
-  const riverHeight = Math.round(height * 0.05);
 
   // Initialize environment renderer (once)
   useEffect(() => {
     const config: ArenaConfig = {
       width,
       height,
-      riverY: height / 2,
+      riverY,
       riverHeight,
       bridgePositions,
     };
@@ -47,9 +47,11 @@ const Arena: React.FC<ArenaProps> = ({
     // Load assets and generate decorations
     envRenderer.loadAssets().then(() => {
       envRenderer.generateDefaultDecorations();
-      isReadyRef.current = true;
       console.log('Arena: Ready');
     });
+
+    // Preload tower sprites
+    preloadTowerSprites();
 
     return () => {
       if (animationRef.current) {
