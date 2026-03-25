@@ -15,7 +15,7 @@ function App() {
       // === ENEMY TOWERS (top, y: 100-280) ===
       { 
         id: 'enemy-king', 
-        position: { x: 253, y: 180 }, 
+        position: { x: 313, y: 200 }, 
         health: 4824, 
         maxHealth: 4824, 
         type: 'king', 
@@ -26,7 +26,7 @@ function App() {
       },
       { 
         id: 'enemy-princess-left', 
-        position: { x: 100, y: 280 }, 
+        position: { x: 120, y: 340 }, 
         health: 2534, 
         maxHealth: 2534, 
         type: 'princess', 
@@ -37,7 +37,7 @@ function App() {
       },
       { 
         id: 'enemy-princess-right', 
-        position: { x: 406, y: 280 }, 
+        position: { x: 506, y: 340 }, 
         health: 2534, 
         maxHealth: 2534, 
         type: 'princess', 
@@ -50,7 +50,7 @@ function App() {
       // === PLAYER TOWERS (bottom, y: 550-650) ===
       { 
         id: 'player-king', 
-        position: { x: 253, y: 650 }, 
+        position: { x: 313, y: 760 }, 
         health: 4824, 
         maxHealth: 4824, 
         type: 'king', 
@@ -61,7 +61,7 @@ function App() {
       },
       { 
         id: 'player-princess-left', 
-        position: { x: 100, y: 552 }, 
+        position: { x: 120, y: 630 }, 
         health: 2534, 
         maxHealth: 2534, 
         type: 'princess', 
@@ -72,7 +72,7 @@ function App() {
       },
       { 
         id: 'player-princess-right', 
-        position: { x: 406, y: 552 }, 
+        position: { x: 506, y: 630 }, 
         health: 2534, 
         maxHealth: 2534, 
         type: 'princess', 
@@ -86,8 +86,8 @@ function App() {
   }, []);
 
   // Arena dimensions match background texture
-  const ARENA_WIDTH = 506;
-  const ARENA_HEIGHT = 832;
+  const ARENA_WIDTH = 626;
+  const ARENA_HEIGHT = 966;
 
   return (
     <div className="app">

@@ -15,20 +15,20 @@ interface ArenaProps {
 const Arena: React.FC<ArenaProps> = ({ 
   towers, 
   units, 
-  width = 506, 
-  height = 832 
+  width = 626, 
+  height = 966 
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const envRendererRef = useRef<EnvironmentRenderer | null>(null);
   const animationRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
 
-  // River configuration: Y = 416, bridges at X = 126 and X = 380
-  const riverY = 416;
-  const riverHeight = 40;
+  // River configuration: Y = 485, bridges at X = 156 and X = 470
+  const riverY = 485;
+  const riverHeight = 50;
   const bridgePositions = [
-    { x: 126, y: riverY },
-    { x: 380, y: riverY },
+    { x: 156, y: riverY },
+    { x: 470, y: riverY },
   ];
 
   // Initialize environment renderer (once)
