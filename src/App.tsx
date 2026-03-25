@@ -1,113 +1,31 @@
 import { useState, useEffect } from 'react';
-import Timer from './components/ui/Timer';
-import ElixirBar from './components/ui/ElixirBar';
-import CardHand from './components/ui/CardHand';
 import Arena from './components/game/Arena';
-import type { GameState, Card, Tower, Unit } from './types';
+import type { Tower, Unit } from './types';
 import './App.css';
 
-// Initial game state
-const createInitialState = (): GameState => ({
-  time: 180,
-  elixir: 5,
-  maxElixir: 10,
-  cards: [
-    { id: '1', type: 'Knight', elixirCost: 4 },
-    { id: '2', type: 'Archer', elixirCost: 3 },
-    { id: '3', type: 'Goblin', elixirCost: 3 },
-    { id: '4', type: 'Fireball', elixirCost: 4 },
-  ],
-  units: [],
-  towers: [
-    { id: 'pt', position: { x: 200, y: 150 }, health: 100, maxHealth: 100, isKingTower: false },
-    { id: 'pb', position: { x: 200, y: 450 }, health: 100, maxHealth: 100, isKingTower: false },
-    { id: 'pk', position: { x: 200, y: 300 }, health: 150, maxHealth: 150, isKingTower: true },
-    { id: 'et', position: { x: 600, y: 150 }, health: 100, maxHealth: 100, isKingTower: false },
-    { id: 'eb', position: { x: 600, y: 450 }, health: 100, maxHealth: 100, isKingTower: false },
-    { id: 'ek', position: { x: 600, y: 300 }, health: 150, maxHealth: 150, isKingTower: true },
-  ],
-  isGameOver: false,
-});
-
 function App() {
-  const [gameState, setGameState] = useState<GameState>(createInitialState);
+  const [towers, setTowers] = useState<Tower[]>([]);
+  const [units] = useState<Unit[]>([]);
 
-  // Game timer
+  // Initialize towers
   useEffect(() => {
-    if (gameState.isGameOver) return;
-
-    const timer = setInterval(() => {
-      setGameState((prev) => {
-        if (prev.time <= 0) {
-          return { ...prev, isGameOver: true };
-        }
-        return { ...prev, time: prev.time - 1 };
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [gameState.isGameOver]);
-
-  // Elixir regeneration
-  useEffect(() => {
-    if (gameState.isGameOver) return;
-
-    const elixirTimer = setInterval(() => {
-      setGameState((prev) => ({
-        ...prev,
-        elixir: Math.min(prev.elixir + 1, prev.maxElixir),
-      }));
-    }, 3000);
-
-    return () => clearInterval(elixirTimer);
-  }, [gameState.isGameOver]);
-
-  const handleCardClick = (card: Card) => {
-    if (gameState.elixir < card.elixirCost) return;
-
-    setGameState((prev) => ({
-      ...prev,
-      elixir: prev.elixir - card.elixirCost,
-      units: [
-        ...prev.units,
-        {
-          id: `${Date.now()}`,
-          type: card.type,
-          position: { x: 100, y: 300 },
-          health: 50,
-          maxHealth: 50,
-          speed: 1,
-          damage: 10,
-          range: 50,
-          isEnemy: false,
-        },
-      ],
-    }));
-  };
+    const initialTowers: Tower[] = [
+      // Player towers (bottom)
+      { id: 'player-princess-left', position: { x: 150, y: 450 }, health: 2534, maxHealth: 2534, type: 'princess', team: 'player', state: 'idle', isKingTower: false, animationState: { currentAnimation: 'idle', currentFrame: 0, frameTime: 0, playing: true, completed: false } },
+      { id: 'player-princess-right', position: { x: 650, y: 450 }, health: 2534, maxHealth: 2534, type: 'princess', team: 'player', state: 'idle', isKingTower: false, animationState: { currentAnimation: 'idle', currentFrame: 0, frameTime: 0, playing: true, completed: false } },
+      { id: 'player-king', position: { x: 400, y: 500 }, health: 4824, maxHealth: 4824, type: 'king', team: 'player', state: 'idle', isKingTower: true, animationState: { currentAnimation: 'idle', currentFrame: 0, frameTime: 0, playing: true, completed: false } },
+      // Enemy towers (top)
+      { id: 'enemy-princess-left', position: { x: 150, y: 150 }, health: 2534, maxHealth: 2534, type: 'princess', team: 'enemy', state: 'idle', isKingTower: false, animationState: { currentAnimation: 'idle', currentFrame: 0, frameTime: 0, playing: true, completed: false } },
+      { id: 'enemy-princess-right', position: { x: 650, y: 150 }, health: 2534, maxHealth: 2534, type: 'princess', team: 'enemy', state: 'idle', isKingTower: false, animationState: { currentAnimation: 'idle', currentFrame: 0, frameTime: 0, playing: true, completed: false } },
+      { id: 'enemy-king', position: { x: 400, y: 100 }, health: 4824, maxHealth: 4824, type: 'king', team: 'enemy', state: 'idle', isKingTower: true, animationState: { currentAnimation: 'idle', currentFrame: 0, frameTime: 0, playing: true, completed: false } },
+    ];
+    setTowers(initialTowers);
+  }, []);
 
   return (
     <div className="app">
       <div className="game-container">
-        <ElixirBar elixir={gameState.elixir} maxElixir={gameState.maxElixir} side="left" />
-        
-        <div className="game-area">
-          <div className="top-bar">
-            <Timer time={gameState.time} />
-          </div>
-          
-          <Arena 
-            towers={gameState.towers} 
-            units={gameState.units}
-            width={800}
-            height={600}
-          />
-          
-          <div className="bottom-bar">
-            <CardHand cards={gameState.cards} onCardClick={handleCardClick} />
-          </div>
-        </div>
-
-        <ElixirBar elixir={8} maxElixir={10} side="right" />
+        <Arena towers={towers} units={units} width={800} height={600} />
       </div>
     </div>
   );

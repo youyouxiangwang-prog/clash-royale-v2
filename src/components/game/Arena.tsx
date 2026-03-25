@@ -5,8 +5,6 @@ import { drawUnit } from './Unit';
 
 // Arena texture constants
 const ARENA_TEXTURE_PATH = 'assets/game/arena_training_tex.png';
-const ARENA_TEXTURE_WIDTH = 970;
-const ARENA_TEXTURE_HEIGHT = 1018;
 
 interface ArenaProps {
   towers: TowerType[];

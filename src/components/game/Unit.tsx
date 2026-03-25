@@ -12,7 +12,6 @@ const DEFAULT_UNIT_SPRITE = 'assets/game/units/knight.png';
 
 // Image cache for unit sprites
 const unitSpriteCache: Map<string, HTMLImageElement> = new Map();
-let spriteLoadError = false;
 
 interface UnitProps {
   unit: UnitType;
@@ -42,7 +41,6 @@ const Unit: React.FC<UnitProps> = ({ unit }) => {
       setSpriteLoaded(true);
     };
     img.onerror = () => {
-      spriteLoadError = true;
     };
   }, [unit.type, spritePath]);
 

@@ -138,8 +138,8 @@ export class AnimationManager {
     const frameInterval = 1000 / config.fps;
     let newFrameTime = state.frameTime + deltaTime;
     let newFrame = state.currentFrame;
-    let completed = state.completed;
-    let playing = state.playing;
+    let completed: boolean = state.completed;
+    let playing: boolean = state.playing;
 
     // Advance frames based on elapsed time
     while (newFrameTime >= frameInterval) {

@@ -10,7 +10,6 @@ interface TowerProps {
 
 // Image cache for tower sprite
 let towerSpriteCache: HTMLImageElement | null = null;
-let spriteLoadError = false;
 
 const Tower: React.FC<TowerProps> = ({ tower }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -33,7 +32,6 @@ const Tower: React.FC<TowerProps> = ({ tower }) => {
       setSpriteLoaded(true);
     };
     img.onerror = () => {
-      spriteLoadError = true;
     };
   }, []);
 
