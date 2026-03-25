@@ -1,5 +1,10 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import type { Tower as TowerType, Unit as UnitType } from '../../types';
+
+// Arena texture constants
+const ARENA_TEXTURE_PATH = 'assets/sc/arena_training_tex.png';
+const ARENA_TEXTURE_WIDTH = 970;
+const ARENA_TEXTURE_HEIGHT = 1018;
 
 interface ArenaProps {
   towers: TowerType[];
@@ -15,7 +20,24 @@ const Arena: React.FC<ArenaProps> = ({
   height = 600 
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [textureLoaded, setTextureLoaded] = useState(false);
+  const [textureError, setTextureError] = useState(false);
+  const textureRef = useRef<HTMLImageElement | null>(null);
 
+  // Load arena texture
+  useEffect(() => {
+    const img = new Image();
+    img.src = ARENA_TEXTURE_PATH;
+    img.onload = () => {
+      textureRef.current = img;
+      setTextureLoaded(true);
+    };
+    img.onerror = () => {
+      setTextureError(true);
+    };
+  }, []);
+
+  // Draw arena
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -26,12 +48,18 @@ const Arena: React.FC<ArenaProps> = ({
     // Clear canvas
     ctx.clearRect(0, 0, width, height);
 
-    // Draw ground (simple gradient)
-    const groundGradient = ctx.createLinearGradient(0, 0, 0, height);
-    groundGradient.addColorStop(0, '#4a7c4e');
-    groundGradient.addColorStop(1, '#3d6b41');
-    ctx.fillStyle = groundGradient;
-    ctx.fillRect(0, 0, width, height);
+    // Draw background texture if loaded, otherwise draw gradient
+    if (textureLoaded && textureRef.current) {
+      // Draw texture scaled to fit canvas
+      ctx.drawImage(textureRef.current, 0, 0, width, height);
+    } else {
+      // Draw ground (simple gradient)
+      const groundGradient = ctx.createLinearGradient(0, 0, 0, height);
+      groundGradient.addColorStop(0, '#4a7c4e');
+      groundGradient.addColorStop(1, '#3d6b41');
+      ctx.fillStyle = groundGradient;
+      ctx.fillRect(0, 0, width, height);
+    }
 
     // Draw lanes
     ctx.strokeStyle = '#3d5a3a';
@@ -117,15 +145,24 @@ const Arena: React.FC<ArenaProps> = ({
       ctx.fillRect(x - 12, y - 25, 24 * healthPercent, 4);
     });
 
-  }, [towers, units, width, height]);
+  }, [towers, units, width, height, textureLoaded]);
+
+  // Handle texture load failure gracefully
+  useEffect(() => {
+    if (textureError) {
+      console.error('Failed to load arena texture');
+    }
+  }, [textureError]);
 
   return (
-    <div className="arena-container">
+    <div className="arena-container" style={{ position: 'relative', width, height }}>
       <canvas 
         ref={canvasRef} 
         width={width} 
         height={height}
         className="arena-canvas"
+        role="img"
+        aria-label="arena"
       />
     </div>
   );

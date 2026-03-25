@@ -1,3 +1,4 @@
+import React from 'react';
 import type { Tower as TowerType } from '../../types';
 
 interface TowerProps {
@@ -9,10 +10,11 @@ const Tower: React.FC<TowerProps> = ({ tower }) => {
 
   return (
     <div 
-      className={`tower ${tower.isKingTower ? 'king' : ''}`}
+      className={`tower ${tower.isKingTower ? 'king' : 'princess'}`}
       style={{
-        left: tower.position.x,
-        top: tower.position.y,
+        position: 'absolute',
+        left: `${tower.position.x}px`,
+        top: `${tower.position.y}px`,
       }}
     >
       <div className="tower-body" />

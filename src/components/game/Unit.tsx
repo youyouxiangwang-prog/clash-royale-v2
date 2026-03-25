@@ -1,3 +1,4 @@
+import React from 'react';
 import type { Unit as UnitType } from '../../types';
 
 interface UnitProps {
@@ -11,8 +12,9 @@ const Unit: React.FC<UnitProps> = ({ unit }) => {
     <div 
       className={`unit ${unit.isEnemy ? 'enemy' : 'ally'}`}
       style={{
-        left: unit.position.x,
-        top: unit.position.y,
+        position: 'absolute',
+        left: `${unit.position.x}px`,
+        top: `${unit.position.y}px`,
       }}
     >
       <div className="unit-body" />
