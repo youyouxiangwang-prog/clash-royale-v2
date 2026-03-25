@@ -7,15 +7,11 @@ function App() {
   const [towers, setTowers] = useState<Tower[]>([]);
   const [units] = useState<Unit[]>([]);
 
-  // Initialize towers with CORRECT positions for 506x832 portrait arena
   useEffect(() => {
-    // All positions hardcoded for 506x832 canvas
-    // River is at Y=416, bridges at X=126 and X=380
     const initialTowers: Tower[] = [
-      // === ENEMY TOWERS (top, y: 100-280) ===
       { 
         id: 'enemy-king', 
-        position: { x: 313, y: 200 }, 
+        position: { x: 282, y: 0 }, 
         health: 4824, 
         maxHealth: 4824, 
         type: 'king', 
@@ -26,7 +22,7 @@ function App() {
       },
       { 
         id: 'enemy-princess-left', 
-        position: { x: 120, y: 340 }, 
+        position: { x: 125, y: 54 }, 
         health: 2534, 
         maxHealth: 2534, 
         type: 'princess', 
@@ -37,7 +33,7 @@ function App() {
       },
       { 
         id: 'enemy-princess-right', 
-        position: { x: 506, y: 340 }, 
+        position: { x: 438, y: 54 }, 
         health: 2534, 
         maxHealth: 2534, 
         type: 'princess', 
@@ -46,11 +42,9 @@ function App() {
         isKingTower: false, 
         animationState: { currentAnimation: 'idle', currentFrame: 0, frameTime: 0, playing: true, completed: false } 
       },
-      
-      // === PLAYER TOWERS (bottom, y: 550-650) ===
       { 
         id: 'player-king', 
-        position: { x: 313, y: 760 }, 
+        position: { x: 282, y: 912 }, 
         health: 4824, 
         maxHealth: 4824, 
         type: 'king', 
@@ -61,7 +55,7 @@ function App() {
       },
       { 
         id: 'player-princess-left', 
-        position: { x: 120, y: 630 }, 
+        position: { x: 125, y: 859 }, 
         health: 2534, 
         maxHealth: 2534, 
         type: 'princess', 
@@ -72,7 +66,7 @@ function App() {
       },
       { 
         id: 'player-princess-right', 
-        position: { x: 506, y: 630 }, 
+        position: { x: 438, y: 859 }, 
         health: 2534, 
         maxHealth: 2534, 
         type: 'princess', 

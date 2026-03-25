@@ -23,12 +23,11 @@ const Arena: React.FC<ArenaProps> = ({
   const animationRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
 
-  // River configuration: Y = 485, bridges at X = 156 and X = 470
-  const riverY = 485;
+  const riverY = 483;
   const riverHeight = 50;
   const bridgePositions = [
-    { x: 156, y: riverY },
-    { x: 470, y: riverY },
+    { x: 188, y: riverY },
+    { x: 438, y: riverY },
   ];
 
   // Initialize environment renderer (once)
