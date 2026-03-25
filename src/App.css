@@ -1,0 +1,236 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #1a1a2e;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.game-container {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.game-area {
+  display: flex;
+  flex-direction: column;
+  background: #16213e;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.top-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  background: #0f3460;
+}
+
+.bottom-bar {
+  padding: 15px;
+  background: #0f3460;
+}
+
+/* Timer */
+.timer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.timer-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Elixir Bar */
+.elixir-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 5px;
+  background: #16213e;
+  border-radius: 12px;
+  min-width: 50px;
+}
+
+.elixir-icon {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.elixir-track {
+  width: 20px;
+  height: 200px;
+  background: #333;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.elixir-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, #9b59b6, #e91e63);
+  transition: height 0.3s ease;
+}
+
+.elixir-count {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* Card Hand */
+.card-hand {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.card {
+  width: 70px;
+  height: 90px;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 3px solid #fff;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.card-icon {
+  font-size: 28px;
+  color: #fff;
+  font-weight: bold;
+}
+
+.card-cost {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  width: 25px;
+  height: 25px;
+  background: #e91e63;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  border: 2px solid #fff;
+}
+
+/* Arena */
+.arena-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.arena-canvas {
+  display: block;
+  border-radius: 8px;
+}
+
+/* Units in DOM (not using canvas for now) */
+.unit {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.unit.ally {
+  background: #3498db;
+  border: 2px solid #fff;
+}
+
+.unit.enemy {
+  background: #e74c3c;
+  border: 2px solid #fff;
+}
+
+.unit-health {
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #333;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.unit-health-fill {
+  height: 100%;
+  background: #4caf50;
+  transition: width 0.2s;
+}
+
+/* Towers in DOM (not using canvas for now) */
+.tower {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.tower.king {
+  /* King tower styles */
+}
+
+.tower-body {
+  width: 40px;
+  height: 40px;
+  background: #a0522d;
+  border: 2px solid #8b4513;
+}
+
+.tower-health {
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: #333;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.tower-health-fill {
+  height: 100%;
+  background: #4caf50;
+  transition: width 0.2s;
+}
