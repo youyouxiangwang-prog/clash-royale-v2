@@ -65,13 +65,13 @@ Y: 652-832    → Player Territory
 | King Tower | `/assets/game/tower.png` | 407x471 | Single tower sprite |
 | Building Tower Tex | `/assets/game/building_tower_tex.png` | 1982x2542 | Texture atlas (NOT USED) |
 | Tower Animation | `building_tower_out/*.png` | 407x471 | 214 animation frames |
-| Princess Tower | Reference only | - | `building_tower_out/` |
+| Princess Tower | `chr_princess_out/*.png` | ? | 748 frames! |
 
 ### ⚠️ Tower Sprite Analysis
 
 **问题：当前只有一个 `tower.png`**
 
-真实 Clash Royale 中：
+真实 Clash Royale 中敌方塔和我方塔的视角不同：
 - **敌方塔**：玩家从外部看，看到塔的正面（有炮口朝向玩家）
 - **我方塔**：玩家从内部看，看到塔的背面（无炮口可见）
 
@@ -80,18 +80,43 @@ Y: 652-832    → Player Territory
 - 敌方塔：正常显示
 - 我方塔：水平翻转 (`ctx.scale(-1, 1)`)
 
-**需要验证：**
-- `tower.png` 是否有明显的正面/背面之分？
-- `building_tower_out/` 的 214 帧是否包含前视/后视？
+---
 
-### Unit Sprites
+## 3.1 Tower Sprite Images
+
+### 当前使用的 Tower Sprite (tower.png)
+![tower-main.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/tower-main.png)
+
+### 塔动画帧 - 帧 014 (building_tower_out/)
+![anim-014.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/anim-014.png)
+
+### 塔动画帧 - 帧 098
+![anim-098.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/anim-098.png)
+
+### 塔动画帧 - 帧 197 (最后几帧之一)
+![anim-197.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/anim-197.png)
+
+### 公主塔精灵 - 帧 000 (chr_princess_out/)
+![princess-000.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/princess-000.png)
+
+### 公主塔精灵 - 帧 014
+![princess-014.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/princess-014.png)
+
+### 公主塔精灵 - 帧 100
+![princess-100.png](https://raw.githubusercontent.com/youyouxiangwang-prog/clash-royale-v2/001-official-assets-ui/public/assets/game/docs/princess-100.png)
+
+---
+
+## 4. Unit Sprites
+
 | Unit | Path | Dimensions |
 |------|------|------------|
 | Knight | `/assets/game/units/knight.png` | ~187x181 |
 | Archer | `/assets/game/units/archer.png` | ~130x135 |
 | Giant | `/assets/game/units/giant.png` | ~189x185 |
 
-### Environment
+## 5. Environment
+
 | Element | Path | Notes |
 |---------|------|-------|
 | Arena Background | `/assets/game/arena_background.png` | 506x832 |
@@ -99,7 +124,7 @@ Y: 652-832    → Player Territory
 
 ---
 
-## 4. Rendering Layers (Final)
+## 6. Rendering Layers (Final)
 
 ```
 Layer 1: Base Color (#3d6b41)
@@ -121,7 +146,7 @@ Layer 8: Health Bars + UI
 
 ---
 
-## 5. Decoration Placement (FIXED)
+## 7. Decoration Placement (FIXED)
 
 ### Placement Rules
 - Trees in corners only (X < 80 or X > 426, Y < 120 or Y > 712)
@@ -149,7 +174,7 @@ Scattered Rocks:
 
 ---
 
-## 6. Implementation Checklist
+## 8. Implementation Checklist
 
 ### Phase 1: Tower Fix
 - [ ] Update App.tsx with correct tower positions (table above)
@@ -173,7 +198,7 @@ Scattered Rocks:
 
 ---
 
-## 7. File Changes Required
+## 9. File Changes Required
 
 | File | Changes |
 |------|---------|
@@ -183,7 +208,7 @@ Scattered Rocks:
 
 ---
 
-## 8. Acceptance Criteria
+## 10. Acceptance Criteria
 
 1. ✅ 6 towers visible at correct positions (3 enemy top, 3 player bottom)
 2. ✅ King tower in center, princess towers on sides
@@ -197,14 +222,15 @@ Scattered Rocks:
 
 ---
 
-## 9. Open Questions
+## 11. Questions for Confirmation
 
-- [ ] Does `tower.png` show clear front vs back of tower?
-- [ ] Should we use `building_tower_out/214frames` for tower animation?
-- [ ] Are princess towers different from king towers visually?
-- [ ] Need to verify player tower "back view" is acceptable
+1. **Tower Sprite**: Is `tower.png` suitable for both enemy and player towers?
+   - Should we use horizontal flip for player towers?
+2. **Princess vs King**: Are princess towers visually different from king towers?
+   - Should we use `chr_princess_out/` frames instead?
+3. **Animation**: Should towers animate using the 214/748 frame sequences?
+   - Current: Static sprite only
 
 ---
 
 *Last updated: 2026-03-25*
-*Needs: User confirmation on tower sprite approach*
