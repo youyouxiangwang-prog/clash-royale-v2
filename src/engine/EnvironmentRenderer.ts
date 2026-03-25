@@ -91,11 +91,15 @@ export class EnvironmentRenderer {
    * Generate default decoration placement
    * Places trees, bushes, rocks in a realistic Clash Royale style layout
    * Uses symmetric placement and avoids lanes/towers
+   * Optimized for 506x832 portrait arena
    */
   generateDefaultDecorations(): void {
     const { width, height } = this.config;
     const avoidZones = getDefaultAvoidZones(this.config);
     const decorations: DecorationPlacement[] = [];
+    
+    // River is at height/2, riverHeight ~40
+    // Bridges at width*0.25 and width*0.75
     
     // Helper to check if position is valid
     const isValidPosition = (x: number, y: number, margin: number = 40): boolean => {
@@ -114,7 +118,7 @@ export class EnvironmentRenderer {
       return true;
     };
     
-    // Helper to add decoration with mirror symmetry
+    // Helper to add decoration with mirror symmetry (left/right)
     const addSymmetricDecoration = (x: number, y: number, spriteIndex: number, scale: number) => {
       const mirrorX = width - x;
       
@@ -124,7 +128,7 @@ export class EnvironmentRenderer {
           x,
           y,
           scale,
-          flip: x > width / 2, // Face inward
+          flip: x > width / 2, // Face inward toward center
         });
       }
       
@@ -140,66 +144,66 @@ export class EnvironmentRenderer {
     };
     
     // === TREES (0-15): Place in corners and along edges ===
-    // Top-left corner cluster
-    addSymmetricDecoration(60, 80, 0, 0.9);
-    addSymmetricDecoration(100, 60, 1, 0.85);
-    addSymmetricDecoration(40, 120, 2, 0.8);
+    // Top corners (enemy side)
+    addSymmetricDecoration(50, 70, 0, 0.85);
+    addSymmetricDecoration(85, 50, 1, 0.8);
+    addSymmetricDecoration(35, 110, 2, 0.75);
     
-    // Bottom-left corner cluster
-    addSymmetricDecoration(60, height - 80, 3, 0.9);
-    addSymmetricDecoration(100, height - 60, 4, 0.85);
-    addSymmetricDecoration(40, height - 120, 5, 0.8);
+    // Bottom corners (player side)
+    addSymmetricDecoration(50, height - 70, 3, 0.85);
+    addSymmetricDecoration(85, height - 50, 4, 0.8);
+    addSymmetricDecoration(35, height - 110, 5, 0.75);
     
-    // Mid-edge trees (left and right)
-    addSymmetricDecoration(50, height * 0.3, 6, 0.75);
-    addSymmetricDecoration(50, height * 0.7, 7, 0.75);
+    // Mid-left and mid-right edges
+    addSymmetricDecoration(45, height * 0.35, 6, 0.7);
+    addSymmetricDecoration(45, height * 0.65, 7, 0.7);
     
     // === BUSHES (16-40): Place near lane edges and corners ===
-    // Near top towers
-    addSymmetricDecoration(120, 100, 16, 0.65);
-    addSymmetricDecoration(180, 120, 17, 0.6);
+    // Near enemy towers (top)
+    addSymmetricDecoration(100, 90, 16, 0.6);
+    addSymmetricDecoration(150, 110, 17, 0.55);
     
-    // Near bottom towers
-    addSymmetricDecoration(120, height - 100, 18, 0.65);
-    addSymmetricDecoration(180, height - 120, 19, 0.6);
+    // Near player towers (bottom)
+    addSymmetricDecoration(100, height - 90, 18, 0.6);
+    addSymmetricDecoration(150, height - 110, 19, 0.55);
     
-    // Along river banks (but not in river)
-    addSymmetricDecoration(80, height / 2 - 50, 20, 0.55);
-    addSymmetricDecoration(80, height / 2 + 50, 21, 0.55);
+    // Along river banks (above and below river)
+    addSymmetricDecoration(70, height * 0.42, 20, 0.5);
+    addSymmetricDecoration(70, height * 0.58, 21, 0.5);
     
-    // Scattered bushes
+    // Scattered bushes in grass areas
     for (let i = 0; i < 4; i++) {
-      const baseX = 100 + i * 40;
-      const baseY = height * 0.25 + (i % 2) * height * 0.5;
-      addSymmetricDecoration(baseX, baseY, 22 + i, 0.5 + Math.random() * 0.2);
+      const baseX = 80 + i * 35;
+      const baseY = height * 0.2 + (i % 2) * height * 0.6;
+      addSymmetricDecoration(baseX, baseY, 22 + i, 0.5 + Math.random() * 0.15);
     }
     
     // === ROCKS (41-60): Scatter in grass areas ===
     const rockPositions = [
-      { x: 150, y: 180 }, { x: 200, y: 220 },
-      { x: 100, y: height * 0.35 }, { x: 150, y: height * 0.4 },
-      { x: 150, y: height - 180 }, { x: 200, y: height - 220 },
-      { x: 100, y: height * 0.65 }, { x: 150, y: height * 0.6 },
+      { x: 120, y: 160 }, { x: 160, y: 200 },
+      { x: 80, y: height * 0.28 }, { x: 120, y: height * 0.32 },
+      { x: 120, y: height - 160 }, { x: 160, y: height - 200 },
+      { x: 80, y: height * 0.72 }, { x: 120, y: height * 0.68 },
     ];
     
     for (let i = 0; i < rockPositions.length; i++) {
       const pos = rockPositions[i];
-      addSymmetricDecoration(pos.x, pos.y, 41 + (i % 10), 0.6 + Math.random() * 0.2);
+      addSymmetricDecoration(pos.x, pos.y, 41 + (i % 10), 0.55 + Math.random() * 0.15);
     }
     
     // === FLOWERS/PLANTS (61-80): Small decorative elements ===
     const flowerPositions = [
-      { x: 200, y: 150 }, { x: 250, y: 180 },
-      { x: 200, y: height - 150 }, { x: 250, y: height - 180 },
+      { x: 170, y: 130 }, { x: 210, y: 160 },
+      { x: 170, y: height - 130 }, { x: 210, y: height - 160 },
     ];
     
     for (let i = 0; i < flowerPositions.length; i++) {
       const pos = flowerPositions[i];
-      addSymmetricDecoration(pos.x, pos.y, 61 + i, 0.45);
+      addSymmetricDecoration(pos.x, pos.y, 61 + i, 0.4);
     }
     
     this.decorations = decorations;
-    console.log(`EnvironmentRenderer: Generated ${decorations.length} decorations (symmetric layout)`);
+    console.log(`EnvironmentRenderer: Generated ${decorations.length} decorations (symmetric layout for ${width}x${height})`);
   }
   
   /**

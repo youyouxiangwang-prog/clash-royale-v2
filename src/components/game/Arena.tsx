@@ -24,11 +24,14 @@ const Arena: React.FC<ArenaProps> = ({
   const lastTimeRef = useRef<number>(0);
   const [isEnvReady, setIsEnvReady] = useState(false);
 
-  // Bridge positions (left and right bridges)
+  // Bridge positions (left and right bridges for portrait arena)
   const bridgePositions = [
     { x: width * 0.25, y: height / 2 },
     { x: width * 0.75, y: height / 2 },
   ];
+
+  // River height should be proportional to arena size
+  const riverHeight = Math.round(height * 0.05); // ~5% of height = ~42 for 832
 
   // Initialize environment renderer
   useEffect(() => {
@@ -36,7 +39,7 @@ const Arena: React.FC<ArenaProps> = ({
       width,
       height,
       riverY: height / 2,
-      riverHeight: 40,
+      riverHeight,
       bridgePositions,
     };
 

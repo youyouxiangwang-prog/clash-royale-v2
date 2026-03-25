@@ -6,11 +6,12 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #1a1a2e;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 }
 
 .app {
@@ -18,12 +19,15 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  padding: 20px;
 }
 
 .game-container {
   display: flex;
   gap: 10px;
   align-items: stretch;
+  max-width: 100vw;
+  max-height: 100vh;
 }
 
 .game-area {
@@ -158,11 +162,17 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .arena-canvas {
   display: block;
-  border-radius: 8px;
+  border-radius: 12px;
+  /* Ensure canvas doesn't stretch beyond container */
+  max-width: 100%;
+  height: auto;
 }
 
 /* Units in DOM (not using canvas for now) */
